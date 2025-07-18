@@ -4,10 +4,12 @@ import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Users, Calendar, UserCheck, Settings } from "lucide-react"
+import { ImageIcon } from "lucide-react"
 import MembersManagement from "@/components/admin/members-management"
 import EventsManagement from "@/components/admin/events-management"
 import CommitteesManagement from "@/components/admin/committees-management"
 import UsersManagement from "@/components/admin/users-management"
+import HomeImagesManagement from "@/components/admin/home-images-management"
 
 export default function AdminDashboard() {
   const [user, setUser] = useState(null)
@@ -103,6 +105,16 @@ export default function AdminDashboard() {
               <div className="text-2xl font-bold">{stats.totalCommittees}</div>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Home Images</CardTitle>
+              <ImageIcon className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">Manage Home Images</div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Management Tabs */}
@@ -112,6 +124,7 @@ export default function AdminDashboard() {
             <TabsTrigger value="members">Members</TabsTrigger>
             <TabsTrigger value="events">Events</TabsTrigger>
             <TabsTrigger value="committees">Committees</TabsTrigger>
+            <TabsTrigger value="home-images">Home Images</TabsTrigger>
           </TabsList>
 
           <TabsContent value="users">
@@ -128,6 +141,10 @@ export default function AdminDashboard() {
 
           <TabsContent value="committees">
             <CommitteesManagement />
+          </TabsContent>
+
+          <TabsContent value="home-images">
+            <HomeImagesManagement />
           </TabsContent>
         </Tabs>
       </div>

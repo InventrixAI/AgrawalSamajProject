@@ -5,13 +5,16 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 import { Calendar, Users, Award, Heart } from "lucide-react"
+import ImageSlider from "@/components/image-slider"
 
 export default function HomePage() {
   const [upcomingEvents, setUpcomingEvents] = useState([])
+  const [sliderImages, setSliderImages] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     fetchUpcomingEvents()
+    fetchSliderImages()
   }, [])
 
   const fetchUpcomingEvents = async () => {
@@ -26,6 +29,19 @@ export default function HomePage() {
       }
     } catch (error) {
       console.error("Error fetching events:", error)
+    }
+  }
+
+  const fetchSliderImages = async () => {
+    try {
+      const response = await fetch("/api/home-images")
+      const data = await response.json()
+
+      if (data.success) {
+        setSliderImages(data.images)
+      }
+    } catch (error) {
+      console.error("Error fetching slider images:", error)
     } finally {
       setLoading(false)
     }
@@ -41,30 +57,40 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-orange-500 to-red-600 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">Welcome to Bilaspur Agrawal Sabha</h1>
-          <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
-            Preserving our heritage, building our future together as one community
-          </p>
-          <div className="space-x-4">
-            <Link href="/register">
-              <Button size="lg" variant="secondary">
-                Become a Member
-              </Button>
-            </Link>
-            <Link href="/about">
-              <Button
-                size="lg"
-                variant="outline"
-                className="text-white border-white hover:bg-white hover:text-orange-600 bg-transparent"
-              >
-                Learn More
-              </Button>
-            </Link>
+      {/* Hero Section with Image Slider  min-h-screen */}
+      <section className="mb-0">
+        {loading ? (
+          <div className="w-full h-[500px] bg-gradient-to-r from-orange-500 to-red-600 flex items-center justify-center">
+            <div className="text-center text-white">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+              <p className="text-xl">Loading...</p>
+            </div>
           </div>
-        </div>
+        ) : (
+          <ImageSlider images={sliderImages} autoSlide={true} slideInterval={5000} />
+        )}
+
+        {/* Call to Action Buttons */}
+        {/* <div className="bg-gradient-to-r from-orange-500 to-red-600 py-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div className="space-x-4">
+              <Link href="/register">
+                <Button size="lg" variant="secondary">
+                  Become a Member
+                </Button>
+              </Link>
+              <Link href="/about">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="text-white border-white hover:bg-white hover:text-orange-600 bg-transparent"
+                >
+                  Learn More
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div> */}
       </section>
 
       {/* Features Section */}
@@ -129,12 +155,7 @@ export default function HomePage() {
             <p className="text-lg text-gray-600">Join us in our upcoming community gatherings</p>
           </div>
 
-          {loading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600">Loading events...</p>
-            </div>
-          ) : upcomingEvents.length > 0 ? (
+          {upcomingEvents.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {upcomingEvents.map((event) => (
                 <Card key={event.id}>

@@ -36,23 +36,32 @@ export async function signIn(email: string, password: string) {
   try {
     const supabase = createServerClient()
 
-    const { data: user, error } = await supabase.from("users").select("*").eq("email", email).single()
+    const { data: userWithMember, error } = await supabase
+      .from("users")
+      .select(`
+  *,
+  member:members(name)
+`)
+      .eq("email", email)
+      .single()
 
-    if (error || !user) {
+    if (error || !userWithMember) {
       return { success: false, error: "Invalid credentials" }
     }
 
-    const isValid = await bcrypt.compare(password, user.password_hash)
+    const isValid = await bcrypt.compare(password, userWithMember.password_hash)
 
     if (!isValid) {
       return { success: false, error: "Invalid credentials" }
     }
 
-    if (!user.is_approved && user.role === "member") {
+    if (!userWithMember.is_approved && userWithMember.role === "member") {
       return { success: false, error: "Account pending approval" }
     }
 
-    return { success: true, user }
+    const userName = userWithMember.member ? userWithMember.member.name : userWithMember.email
+
+    return { success: true, user: userWithMember, name: userName }
   } catch (error) {
     return { success: false, error: error.message }
   }

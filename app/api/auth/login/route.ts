@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
           email: result.user.email,
           role: result.user.role,
           is_approved: result.user.is_approved,
+          name: result.user.name, // Ensure name is passed here
         },
       })
     } else {
