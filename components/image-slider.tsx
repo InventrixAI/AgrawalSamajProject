@@ -55,7 +55,7 @@ export default function ImageSlider({ images, autoSlide = true, slideInterval = 
   }
 
   return (
-    <div className="relative w-full h-[700px] overflow-hidden rounded-lg  shadow-lg">
+    <div className="relative w-full h-64 sm:h-80 md:h-96 lg:h-[700px] overflow-hidden rounded-lg shadow-lg">
       {/* Images */}
       <div
         className="flex transition-transform duration-500 ease-in-out h-full"
@@ -66,7 +66,7 @@ export default function ImageSlider({ images, autoSlide = true, slideInterval = 
             <img
               src={image.image_url || "/placeholder.svg?height=700&width=1200"}
               alt={image.title || `Slide ${index + 1}`}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
             />
             {/* Overlay */}
             <div className="absolute inset-0 bg-black bg-opacity-10 flex items-center justify-center">

@@ -1,5 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Target, Eye, Award } from "lucide-react"
+import historicalPhoto from "../public/maharaja.png"; // adjust path as per your folder structure
+
 
 export default function AboutPage() {
   return (
@@ -32,9 +34,13 @@ export default function AboutPage() {
                 down while embracing progress and development.
               </p>
             </div>
-            <div className="bg-gray-200 rounded-lg h-96 flex items-center justify-center">
-              <span className="text-gray-500">Historical Photo Placeholder</span>
-            </div>
+            <div className="bg-white-200 rounded-lg h-96 flex items-center justify-center overflow-hidden">
+            <img
+              src="/maharaja.png"
+              alt="Historical Photo"
+              className="rounded-lg max-h-full max-w-full object-contain"
+            />
+          </div>
           </div>
         </section>
 

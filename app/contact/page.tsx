@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { MapPin, Phone, Mail, Clock } from "lucide-react"
+import Link from "next/link"
 
 export default function ContactPage() {
   return (
@@ -31,11 +32,11 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-medium">Address</h3>
                     <p className="text-gray-600">
-                      Bilaspur Agrawal Sabha Office
+                      Bilaspur Agrawal Sabha
                       <br />
-                      Main Road, Bilaspur
+                      C/o Agrasen Bhawan Juni Line,
                       <br />
-                      Chhattisgarh, India - 495001
+                      BILASPUR C.G. 495001
                     </p>
                   </div>
                 </div>
@@ -76,8 +77,14 @@ export default function ContactPage() {
                 <CardTitle>Find Us</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-64 bg-gray-200 rounded-lg flex items-center justify-center">
-                  <span className="text-gray-500">Map Location</span>
+                <div className="h-64 bg-gray-200 rounded-lg flex items-center justify-center object-contain">
+                <Link href="https://maps.app.goo.gl/VFJoHhdyPepwSeMF6" className="text-xl font-bold text-orange-600 object-contain">
+                 <img
+                 src="/googlemaps.jpg"
+                 alt="maps"
+                 
+                 />
+                </Link>
                 </div>
               </CardContent>
             </Card>
