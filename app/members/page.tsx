@@ -5,13 +5,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Phone, MapPin, Briefcase, Search } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Phone, MapPin, Briefcase, Search, Building, Users } from "lucide-react"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Label } from "@/components/ui/label"
 
 export default function MembersPage() {
   const [members, setMembers] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [error, setError] = useState("")
+  const [selectedMember, setSelectedMember] = useState(null)
+  const [dialogOpen, setDialogOpen] = useState(false)
 
   useEffect(() => {
     fetchMembers()
@@ -37,10 +43,17 @@ export default function MembersPage() {
 
   const filteredMembers = members.filter(
     (member) =>
-      member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      member.occupation?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      member.address?.toLowerCase().includes(searchTerm.toLowerCase()),
+      (member.family_head_name || member.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (member.firm_full_name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (member.business || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (member.city || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (member.gotra || "").toLowerCase().includes(searchTerm.toLowerCase()),
   )
+
+  const openMemberDialog = (member) => {
+    setSelectedMember(member)
+    setDialogOpen(true)
+  }
 
   if (loading) {
     return (
@@ -87,7 +100,7 @@ export default function MembersPage() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
-              placeholder="Search members by name, occupation, or location..."
+              placeholder="Search by name, business, city, or gotra..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -106,39 +119,67 @@ export default function MembersPage() {
         {filteredMembers.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredMembers.map((member) => (
-              <Card key={member.id}>
+              <Card key={member.id} className="hover:shadow-lg transition-shadow cursor-pointer">
                 <CardHeader className="text-center">
                   <Avatar className="h-20 w-20 mx-auto mb-4">
                     <AvatarImage src={member.image_url || "/placeholder.svg"} />
-                    <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+                    <AvatarFallback>{(member.family_head_name || member.name || "U").charAt(0)}</AvatarFallback>
                   </Avatar>
-                  <CardTitle className="text-lg">{member.name}</CardTitle>
-                  <Badge variant={member.is_active ? "default" : "secondary"}>
-                    {member.is_active ? "Active Member" : "Inactive"}
-                  </Badge>
+                  <CardTitle className="text-lg">{member.family_head_name || member.name}</CardTitle>
+                  <div className="flex justify-center space-x-2">
+                    <Badge variant={member.is_active ? "default" : "secondary"}>
+                      {member.is_active ? "Active" : "Inactive"}
+                    </Badge>
+                    {member.status && (
+                      <Badge variant="outline" className="text-xs">
+                        {member.status}
+                      </Badge>
+                    )}
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  {member.phone && (
+                  {member.firm_full_name && (
                     <div className="flex items-center text-sm text-gray-600">
-                      <Phone className="h-4 w-4 mr-2" />
-                      {member.phone}
+                      <Building className="h-4 w-4 mr-2" />
+                      {member.firm_full_name}
                     </div>
                   )}
-                  {member.occupation && (
+                  {member.business && (
                     <div className="flex items-center text-sm text-gray-600">
                       <Briefcase className="h-4 w-4 mr-2" />
-                      {member.occupation}
+                      {member.business}
                     </div>
                   )}
-                  {member.address && (
+                  {member.mobile_no1 && (
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Phone className="h-4 w-4 mr-2" />
+                      {member.mobile_no1}
+                    </div>
+                  )}
+                  {member.city && (
                     <div className="flex items-center text-sm text-gray-600">
                       <MapPin className="h-4 w-4 mr-2" />
-                      {member.address}
+                      {member.city}, {member.state}
+                    </div>
+                  )}
+                  {member.gotra && <div className="text-xs text-gray-500 pt-2">Gotra: {member.gotra}</div>}
+                  {member.total_members && (
+                    <div className="flex items-center text-xs text-gray-500">
+                      <Users className="h-3 w-3 mr-1" />
+                      {member.total_members} family member{member.total_members !== 1 ? "s" : ""}
                     </div>
                   )}
                   <div className="text-xs text-gray-500 pt-2">
-                    Member since: {new Date(member.membership_date).toLocaleDateString()}
+                    Member since: {new Date(member.membership_date || member.created_at).toLocaleDateString()}
                   </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full mt-3 bg-transparent"
+                    onClick={() => openMemberDialog(member)}
+                  >
+                    View Details
+                  </Button>
                 </CardContent>
               </Card>
             ))}
@@ -158,6 +199,157 @@ export default function MembersPage() {
             )}
           </div>
         )}
+
+        {/* Member Details Dialog */}
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Member Details</DialogTitle>
+              <DialogDescription>
+                Complete information for {selectedMember?.family_head_name || selectedMember?.name}
+              </DialogDescription>
+            </DialogHeader>
+            {selectedMember && (
+              <div className="space-y-6">
+                <div className="flex items-center space-x-4">
+                  <Avatar className="h-20 w-20">
+                    <AvatarImage src={selectedMember.image_url || "/placeholder.svg"} />
+                    <AvatarFallback className="text-2xl">
+                      {(selectedMember.family_head_name || selectedMember.name || "U").charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h3 className="text-2xl font-bold">{selectedMember.family_head_name || selectedMember.name}</h3>
+                    <p className="text-gray-600">{selectedMember.business}</p>
+                    {selectedMember.gotra && <p className="text-sm text-gray-500">Gotra: {selectedMember.gotra}</p>}
+                    <div className="flex space-x-2 mt-2">
+                      <Badge variant={selectedMember.is_active ? "default" : "secondary"}>
+                        {selectedMember.is_active ? "Active" : "Inactive"}
+                      </Badge>
+                      {selectedMember.status && <Badge variant="outline">{selectedMember.status}</Badge>}
+                    </div>
+                  </div>
+                </div>
+
+                <Tabs defaultValue="personal" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="personal">Personal Info</TabsTrigger>
+                    <TabsTrigger value="business">Business Info</TabsTrigger>
+                    <TabsTrigger value="contact">Contact Info</TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="personal" className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="font-semibold">Family Head Name</Label>
+                        <p>{selectedMember.family_head_name || "N/A"}</p>
+                      </div>
+                      <div>
+                        <Label className="font-semibold">Total Family Members</Label>
+                        <p>{selectedMember.total_members || 1}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <Label className="font-semibold">Home Address</Label>
+                      <p>{selectedMember.home_address || "N/A"}</p>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div>
+                        <Label className="font-semibold">City</Label>
+                        <p>{selectedMember.city || "N/A"}</p>
+                      </div>
+                      <div>
+                        <Label className="font-semibold">District</Label>
+                        <p>{selectedMember.district || "N/A"}</p>
+                      </div>
+                      <div>
+                        <Label className="font-semibold">State</Label>
+                        <p>{selectedMember.state || "N/A"}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <Label className="font-semibold">Gotra</Label>
+                      <p>{selectedMember.gotra || "N/A"}</p>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="business" className="space-y-4">
+                    <div>
+                      <Label className="font-semibold">Firm Full Name</Label>
+                      <p>{selectedMember.firm_full_name || "N/A"}</p>
+                    </div>
+                    <div>
+                      <Label className="font-semibold">Business Type</Label>
+                      <p>{selectedMember.business || "N/A"}</p>
+                    </div>
+                    <div>
+                      <Label className="font-semibold">Firm Address</Label>
+                      <p>{selectedMember.firm_address || "N/A"}</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="font-semibold">Firm Colony</Label>
+                        <p>{selectedMember.firm_colony || "N/A"}</p>
+                      </div>
+                      <div>
+                        <Label className="font-semibold">Firm City</Label>
+                        <p>{selectedMember.firm_city || "N/A"}</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="font-semibold">Firm District</Label>
+                        <p>{selectedMember.firm_district || "N/A"}</p>
+                      </div>
+                      <div>
+                        <Label className="font-semibold">Firm State</Label>
+                        <p>{selectedMember.firm_state || "N/A"}</p>
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="contact" className="space-y-4">
+                    <div>
+                      <Label className="font-semibold">Email</Label>
+                      <p>{selectedMember.email || "N/A"}</p>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div>
+                        <Label className="font-semibold">Mobile No 1</Label>
+                        <p>{selectedMember.mobile_no1 || "N/A"}</p>
+                      </div>
+                      <div>
+                        <Label className="font-semibold">Mobile No 2</Label>
+                        <p>{selectedMember.mobile_no2 || "N/A"}</p>
+                      </div>
+                      <div>
+                        <Label className="font-semibold">Mobile No 3</Label>
+                        <p>{selectedMember.mobile_no3 || "N/A"}</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="font-semibold">Office Number</Label>
+                        <p>{selectedMember.office_no || "N/A"}</p>
+                      </div>
+                      <div>
+                        <Label className="font-semibold">Phone Number</Label>
+                        <p>{selectedMember.phone_no || "N/A"}</p>
+                      </div>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+
+                <div className="flex justify-between items-center pt-4 border-t">
+                  <div className="text-sm text-gray-500">
+                    Member since:{" "}
+                    {new Date(selectedMember.membership_date || selectedMember.created_at).toLocaleDateString()}
+                  </div>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   )

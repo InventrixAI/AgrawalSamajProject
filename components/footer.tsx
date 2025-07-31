@@ -13,6 +13,7 @@ export default function Footer() {
               Serving the Agrawal community in Bilaspur with dedication and commitment to preserve our culture and
               traditions.
             </p>
+            
           </div>
 
           {/* Quick Links */}

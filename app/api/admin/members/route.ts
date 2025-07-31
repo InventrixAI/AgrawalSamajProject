@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server"
-import { supabase } from "@/lib/supabase"
+import { createServerClient } from "@/lib/supabase"
 
 export async function GET() {
   try {
-    const { data: members, error } = await supabase.from("members").select("*").order("name")
+    const supabase = createServerClient()
+
+    const { data: members, error } = await supabase.from("members").select("*").order("family_head_name")
 
     if (error) throw error
 
@@ -18,19 +20,64 @@ export async function GET() {
 
 export async function POST(request) {
   try {
-    const { name, phone, address, occupation, image_url, is_active } = await request.json()
+    const {
+      name,
+      firm_full_name,
+      family_head_name,
+      firm_address,
+      firm_colony,
+      firm_state,
+      firm_district,
+      firm_city,
+      home_address,
+      state,
+      district,
+      city,
+      business,
+      mobile_no1,
+      mobile_no2,
+      mobile_no3,
+      office_no,
+      phone_no,
+      email,
+      gotra,
+      total_members,
+      status,
+      image_url,
+      is_active,
+    } = await request.json()
 
-    if (!name) {
-      return NextResponse.json({ success: false, error: "Name is required" }, { status: 400 })
+    if (!family_head_name) {
+      return NextResponse.json({ success: false, error: "Family head name is required" }, { status: 400 })
     }
+
+    const supabase = createServerClient()
 
     const { data: member, error } = await supabase
       .from("members")
       .insert({
         name,
-        phone,
-        address,
-        occupation,
+        firm_full_name,
+        family_head_name,
+        firm_address,
+        firm_colony,
+        firm_state,
+        firm_district,
+        firm_city,
+        home_address,
+        state,
+        district,
+        city,
+        business,
+        mobile_no1,
+        mobile_no2,
+        mobile_no3,
+        office_no,
+        phone_no,
+        email,
+        gotra,
+        total_members: total_members || 1,
+        status: status || "active",
         image_url,
         is_active: is_active !== undefined ? is_active : true,
       })

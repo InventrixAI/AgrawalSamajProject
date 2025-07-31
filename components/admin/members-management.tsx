@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   Dialog,
   DialogContent,
@@ -19,18 +20,39 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { UserPlus, Edit, Trash2 } from "lucide-react"
+import { UserPlus, Edit, Trash2, Eye } from "lucide-react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function MembersManagement() {
   const [members, setMembers] = useState([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [viewDialogOpen, setViewDialogOpen] = useState(false)
   const [editingMember, setEditingMember] = useState(null)
+  const [viewingMember, setViewingMember] = useState(null)
   const [formData, setFormData] = useState({
     name: "",
-    phone: "",
-    address: "",
-    occupation: "",
+    firm_full_name: "",
+    family_head_name: "",
+    firm_address: "",
+    firm_colony: "",
+    firm_state: "",
+    firm_district: "",
+    firm_city: "",
+    home_address: "",
+    state: "",
+    district: "",
+    city: "",
+    business: "",
+    mobile_no1: "",
+    mobile_no2: "",
+    mobile_no3: "",
+    office_no: "",
+    phone_no: "",
+    email: "",
+    gotra: "",
+    total_members: 1,
+    status: "",
     is_active: true,
   })
   const [error, setError] = useState("")
@@ -126,9 +148,27 @@ export default function MembersManagement() {
   const resetForm = () => {
     setFormData({
       name: "",
-      phone: "",
-      address: "",
-      occupation: "",
+      firm_full_name: "",
+      family_head_name: "",
+      firm_address: "",
+      firm_colony: "",
+      firm_state: "",
+      firm_district: "",
+      firm_city: "",
+      home_address: "",
+      state: "",
+      district: "",
+      city: "",
+      business: "",
+      mobile_no1: "",
+      mobile_no2: "",
+      mobile_no3: "",
+      office_no: "",
+      phone_no: "",
+      email: "",
+      gotra: "",
+      total_members: 1,
+      status: "",
       is_active: true,
     })
     setEditingMember(null)
@@ -138,13 +178,36 @@ export default function MembersManagement() {
   const openEditDialog = (member) => {
     setEditingMember(member)
     setFormData({
-      name: member.name,
-      phone: member.phone || "",
-      address: member.address || "",
-      occupation: member.occupation || "",
+      name: member.name || "",
+      firm_full_name: member.firm_full_name || "",
+      family_head_name: member.family_head_name || "",
+      firm_address: member.firm_address || "",
+      firm_colony: member.firm_colony || "",
+      firm_state: member.firm_state || "",
+      firm_district: member.firm_district || "",
+      firm_city: member.firm_city || "",
+      home_address: member.home_address || "",
+      state: member.state || "",
+      district: member.district || "",
+      city: member.city || "",
+      business: member.business || "",
+      mobile_no1: member.mobile_no1 || "",
+      mobile_no2: member.mobile_no2 || "",
+      mobile_no3: member.mobile_no3 || "",
+      office_no: member.office_no || "",
+      phone_no: member.phone_no || "",
+      email: member.email || "",
+      gotra: member.gotra || "",
+      total_members: member.total_members || 1,
+      status: member.status || "",
       is_active: member.is_active,
     })
     setDialogOpen(true)
+  }
+
+  const openViewDialog = (member) => {
+    setViewingMember(member)
+    setViewDialogOpen(true)
   }
 
   return (
@@ -153,7 +216,7 @@ export default function MembersManagement() {
         <div className="flex justify-between items-center">
           <div>
             <CardTitle>Members Management</CardTitle>
-            <CardDescription>Manage community members</CardDescription>
+            <CardDescription>Manage community members with detailed information</CardDescription>
           </div>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
@@ -162,7 +225,7 @@ export default function MembersManagement() {
                 Add Member
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>{editingMember ? "Edit Member" : "Add New Member"}</DialogTitle>
                 <DialogDescription>
@@ -170,68 +233,270 @@ export default function MembersManagement() {
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit}>
-                <div className="space-y-4">
-                  {error && (
-                    <Alert variant="destructive">
-                      <AlertDescription>{error}</AlertDescription>
-                    </Alert>
-                  )}
+                <Tabs defaultValue="personal" className="w-full">
+                  <TabsList className="grid w-full grid-cols-4">
+                    <TabsTrigger value="personal">Personal</TabsTrigger>
+                    <TabsTrigger value="business">Business</TabsTrigger>
+                    <TabsTrigger value="contact">Contact</TabsTrigger>
+                    <TabsTrigger value="other">Other</TabsTrigger>
+                  </TabsList>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="name">Full Name</Label>
-                      <Input
-                        id="name"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        required
-                      />
-                    </div>
+                  <div className="mt-4">
+                    {error && (
+                      <Alert variant="destructive" className="mb-4">
+                        <AlertDescription>{error}</AlertDescription>
+                      </Alert>
+                    )}
 
-                    <div>
-                      <Label htmlFor="phone">Phone</Label>
-                      <Input
-                        id="phone"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      />
-                    </div>
+                    <TabsContent value="personal" className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="name">Display Name</Label>
+                          <Input
+                            id="name"
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            placeholder="Display name for the member"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="family_head_name">Family Head Name *</Label>
+                          <Input
+                            id="family_head_name"
+                            value={formData.family_head_name}
+                            onChange={(e) => setFormData({ ...formData, family_head_name: e.target.value })}
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="home_address">Home Address</Label>
+                        <Textarea
+                          id="home_address"
+                          value={formData.home_address}
+                          onChange={(e) => setFormData({ ...formData, home_address: e.target.value })}
+                          rows={3}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-4">
+                        <div>
+                          <Label htmlFor="city">City</Label>
+                          <Input
+                            id="city"
+                            value={formData.city}
+                            onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="district">District</Label>
+                          <Input
+                            id="district"
+                            value={formData.district}
+                            onChange={(e) => setFormData({ ...formData, district: e.target.value })}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="state">State</Label>
+                          <Input
+                            id="state"
+                            value={formData.state}
+                            onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="gotra">Gotra</Label>
+                          <Input
+                            id="gotra"
+                            value={formData.gotra}
+                            onChange={(e) => setFormData({ ...formData, gotra: e.target.value })}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="total_members">Total Family Members</Label>
+                          <Input
+                            id="total_members"
+                            type="number"
+                            min="1"
+                            value={formData.total_members}
+                            onChange={(e) =>
+                              setFormData({ ...formData, total_members: Number.parseInt(e.target.value) })
+                            }
+                          />
+                        </div>
+                      </div>
+                    </TabsContent>
+
+                    <TabsContent value="business" className="space-y-4">
+                      <div>
+                        <Label htmlFor="firm_full_name">Firm Full Name</Label>
+                        <Input
+                          id="firm_full_name"
+                          value={formData.firm_full_name}
+                          onChange={(e) => setFormData({ ...formData, firm_full_name: e.target.value })}
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="business">Business Type</Label>
+                        <Input
+                          id="business"
+                          value={formData.business}
+                          onChange={(e) => setFormData({ ...formData, business: e.target.value })}
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="firm_address">Firm Address</Label>
+                        <Textarea
+                          id="firm_address"
+                          value={formData.firm_address}
+                          onChange={(e) => setFormData({ ...formData, firm_address: e.target.value })}
+                          rows={3}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="firm_colony">Firm Colony</Label>
+                          <Input
+                            id="firm_colony"
+                            value={formData.firm_colony}
+                            onChange={(e) => setFormData({ ...formData, firm_colony: e.target.value })}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="firm_city">Firm City</Label>
+                          <Input
+                            id="firm_city"
+                            value={formData.firm_city}
+                            onChange={(e) => setFormData({ ...formData, firm_city: e.target.value })}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="firm_district">Firm District</Label>
+                          <Input
+                            id="firm_district"
+                            value={formData.firm_district}
+                            onChange={(e) => setFormData({ ...formData, firm_district: e.target.value })}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="firm_state">Firm State</Label>
+                          <Input
+                            id="firm_state"
+                            value={formData.firm_state}
+                            onChange={(e) => setFormData({ ...formData, firm_state: e.target.value })}
+                          />
+                        </div>
+                      </div>
+                    </TabsContent>
+
+                    <TabsContent value="contact" className="space-y-4">
+                      <div>
+                        <Label htmlFor="email">Email</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-4">
+                        <div>
+                          <Label htmlFor="mobile_no1">Mobile No 1</Label>
+                          <Input
+                            id="mobile_no1"
+                            value={formData.mobile_no1}
+                            onChange={(e) => setFormData({ ...formData, mobile_no1: e.target.value })}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="mobile_no2">Mobile No 2</Label>
+                          <Input
+                            id="mobile_no2"
+                            value={formData.mobile_no2}
+                            onChange={(e) => setFormData({ ...formData, mobile_no2: e.target.value })}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="mobile_no3">Mobile No 3</Label>
+                          <Input
+                            id="mobile_no3"
+                            value={formData.mobile_no3}
+                            onChange={(e) => setFormData({ ...formData, mobile_no3: e.target.value })}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="office_no">Office Number</Label>
+                          <Input
+                            id="office_no"
+                            value={formData.office_no}
+                            onChange={(e) => setFormData({ ...formData, office_no: e.target.value })}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="phone_no">Phone Number</Label>
+                          <Input
+                            id="phone_no"
+                            value={formData.phone_no}
+                            onChange={(e) => setFormData({ ...formData, phone_no: e.target.value })}
+                          />
+                        </div>
+                      </div>
+                    </TabsContent>
+
+                    <TabsContent value="other" className="space-y-4">
+                      <div>
+                        <Label htmlFor="image">Profile Image</Label>
+                        <Input
+                          id="image"
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => setImageFile(e.target.files[0])}
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="status">Status</Label>
+                        <Select
+                          value={formData.status}
+                          onValueChange={(value) => setFormData({ ...formData, status: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="active">Active</SelectItem>
+                            <SelectItem value="inactive">Inactive</SelectItem>
+                            <SelectItem value="pending">Pending</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="is_active"
+                          checked={formData.is_active}
+                          onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                        />
+                        <Label htmlFor="is_active">Active Member</Label>
+                      </div>
+                    </TabsContent>
                   </div>
-
-                  <div>
-                    <Label htmlFor="occupation">Occupation</Label>
-                    <Input
-                      id="occupation"
-                      value={formData.occupation}
-                      onChange={(e) => setFormData({ ...formData, occupation: e.target.value })}
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="address">Address</Label>
-                    <Textarea
-                      id="address"
-                      value={formData.address}
-                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                      rows={3}
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="image">Profile Image</Label>
-                    <Input id="image" type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files[0])} />
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="is_active"
-                      checked={formData.is_active}
-                      onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                    />
-                    <Label htmlFor="is_active">Active Member</Label>
-                  </div>
-                </div>
+                </Tabs>
 
                 <DialogFooter className="mt-6">
                   <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
@@ -258,10 +523,11 @@ export default function MembersManagement() {
             <TableHeader>
               <TableRow>
                 <TableHead>Member</TableHead>
+                <TableHead>Family Head</TableHead>
+                <TableHead>Business</TableHead>
                 <TableHead>Contact</TableHead>
-                <TableHead>Occupation</TableHead>
+                <TableHead>Location</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Joined</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -272,24 +538,55 @@ export default function MembersManagement() {
                     <div className="flex items-center space-x-3">
                       <Avatar>
                         <AvatarImage src={member.image_url || "/placeholder.svg"} />
-                        <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+                        <AvatarFallback>{(member.family_head_name || member.name || "U").charAt(0)}</AvatarFallback>
                       </Avatar>
                       <div>
-                        <div className="font-medium">{member.name}</div>
-                        <div className="text-sm text-gray-500">{member.address}</div>
+                        <div className="font-medium">{member.name || member.family_head_name}</div>
+                        <div className="text-sm text-gray-500">{member.gotra && `Gotra: ${member.gotra}`}</div>
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell>{member.phone}</TableCell>
-                  <TableCell>{member.occupation}</TableCell>
                   <TableCell>
-                    <Badge variant={member.is_active ? "default" : "secondary"}>
-                      {member.is_active ? "Active" : "Inactive"}
-                    </Badge>
+                    <div>
+                      <div className="font-medium">{member.family_head_name}</div>
+                      <div className="text-sm text-gray-500">
+                        {member.total_members} family member{member.total_members !== 1 ? "s" : ""}
+                      </div>
+                    </div>
                   </TableCell>
-                  <TableCell>{new Date(member.membership_date).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    <div>
+                      <div className="font-medium">{member.firm_full_name || "N/A"}</div>
+                      <div className="text-sm text-gray-500">{member.business}</div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-sm">
+                      {member.mobile_no1 && <div>{member.mobile_no1}</div>}
+                      {member.email && <div className="text-gray-500">{member.email}</div>}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-sm">
+                      {member.city && <div>{member.city}</div>}
+                      {member.state && <div className="text-gray-500">{member.state}</div>}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="space-y-1">
+                      <Badge variant={member.is_active ? "default" : "secondary"}>
+                        {member.is_active ? "Active" : "Inactive"}
+                      </Badge>
+                      {/* <Badge variant="outline" className="text-xs">
+                        {member.status}
+                      </Badge> */}
+                    </div>
+                  </TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
+                      <Button size="sm" variant="outline" onClick={() => openViewDialog(member)}>
+                        <Eye className="h-4 w-4" />
+                      </Button>
                       <Button size="sm" variant="outline" onClick={() => openEditDialog(member)}>
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -303,6 +600,153 @@ export default function MembersManagement() {
             </TableBody>
           </Table>
         )}
+
+        {/* View Member Dialog */}
+        <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Member Details</DialogTitle>
+              <DialogDescription>
+                Complete information for {viewingMember?.family_head_name || viewingMember?.name}
+              </DialogDescription>
+            </DialogHeader>
+            {viewingMember && (
+              <div className="space-y-6">
+                <div className="flex items-center space-x-4">
+                  <Avatar className="h-20 w-20">
+                    <AvatarImage src={viewingMember.image_url || "/placeholder.svg"} />
+                    <AvatarFallback className="text-2xl">
+                      {(viewingMember.family_head_name || viewingMember.name || "U").charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h3 className="text-2xl font-bold">{viewingMember.family_head_name || viewingMember.name}</h3>
+                    <p className="text-gray-600">{viewingMember.business}</p>
+                    {viewingMember.gotra && <p className="text-sm text-gray-500">Gotra: {viewingMember.gotra}</p>}
+                  </div>
+                </div>
+
+                <Tabs defaultValue="personal" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="personal">Personal Info</TabsTrigger>
+                    <TabsTrigger value="business">Business Info</TabsTrigger>
+                    <TabsTrigger value="contact">Contact Info</TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="personal" className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="font-semibold">Family Head Name</Label>
+                        <p>{viewingMember.family_head_name || "N/A"}</p>
+                      </div>
+                      <div>
+                        <Label className="font-semibold">Total Family Members</Label>
+                        <p>{viewingMember.total_members || 1}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <Label className="font-semibold">Home Address</Label>
+                      <p>{viewingMember.home_address || "N/A"}</p>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div>
+                        <Label className="font-semibold">City</Label>
+                        <p>{viewingMember.city || "N/A"}</p>
+                      </div>
+                      <div>
+                        <Label className="font-semibold">District</Label>
+                        <p>{viewingMember.district || "N/A"}</p>
+                      </div>
+                      <div>
+                        <Label className="font-semibold">State</Label>
+                        <p>{viewingMember.state || "N/A"}</p>
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="business" className="space-y-4">
+                    <div>
+                      <Label className="font-semibold">Firm Full Name</Label>
+                      <p>{viewingMember.firm_full_name || "N/A"}</p>
+                    </div>
+                    <div>
+                      <Label className="font-semibold">Business Type</Label>
+                      <p>{viewingMember.business || "N/A"}</p>
+                    </div>
+                    <div>
+                      <Label className="font-semibold">Firm Address</Label>
+                      <p>{viewingMember.firm_address || "N/A"}</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="font-semibold">Firm Colony</Label>
+                        <p>{viewingMember.firm_colony || "N/A"}</p>
+                      </div>
+                      <div>
+                        <Label className="font-semibold">Firm City</Label>
+                        <p>{viewingMember.firm_city || "N/A"}</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="font-semibold">Firm District</Label>
+                        <p>{viewingMember.firm_district || "N/A"}</p>
+                      </div>
+                      <div>
+                        <Label className="font-semibold">Firm State</Label>
+                        <p>{viewingMember.firm_state || "N/A"}</p>
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="contact" className="space-y-4">
+                    <div>
+                      <Label className="font-semibold">Email</Label>
+                      <p>{viewingMember.email || "N/A"}</p>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div>
+                        <Label className="font-semibold">Mobile No 1</Label>
+                        <p>{viewingMember.mobile_no1 || "N/A"}</p>
+                      </div>
+                      <div>
+                        <Label className="font-semibold">Mobile No 2</Label>
+                        <p>{viewingMember.mobile_no2 || "N/A"}</p>
+                      </div>
+                      <div>
+                        <Label className="font-semibold">Mobile No 3</Label>
+                        <p>{viewingMember.mobile_no3 || "N/A"}</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="font-semibold">Office Number</Label>
+                        <p>{viewingMember.office_no || "N/A"}</p>
+                      </div>
+                      <div>
+                        <Label className="font-semibold">Phone Number</Label>
+                        <p>{viewingMember.phone_no || "N/A"}</p>
+                      </div>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+
+                <div className="flex justify-between items-center pt-4 border-t">
+                  <div className="flex space-x-2">
+                    <Badge variant={viewingMember.is_active ? "default" : "secondary"}>
+                      {viewingMember.is_active ? "Active" : "Inactive"}
+                    </Badge>
+                    <Badge variant="outline">{viewingMember.status}</Badge>
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    Member since:{" "}
+                    {new Date(viewingMember.membership_date || viewingMember.created_at).toLocaleDateString()}
+                  </div>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </CardContent>
     </Card>
   )
