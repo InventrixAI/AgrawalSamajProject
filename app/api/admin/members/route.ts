@@ -5,15 +5,56 @@ export async function GET() {
   try {
     const supabase = createServerClient()
 
-    const { data: members, error } = await supabase.from("members").select("*").order("family_head_name")
+    // Get total count first
+    const { count, error: countError } = await supabase.from("members").select("*", { count: "exact", head: true })
 
-    if (error) throw error
+    if (countError) throw countError
+
+    // Fetch all members in batches to avoid any limits
+    let allMembers = []
+    const pageSize = 1000
+    let currentPage = 0
+    let hasMore = true
+
+    while (hasMore) {
+      const start = currentPage * pageSize
+      const end = start + pageSize - 1
+
+      const { data: pageMembers, error } = await supabase
+        .from("members")
+        .select("*")
+        .order("family_head_name")
+        .range(start, end)
+
+      if (error) throw error
+
+      if (pageMembers && pageMembers.length > 0) {
+        allMembers = [...allMembers, ...pageMembers]
+
+        // Check if we got fewer results than requested (last page)
+        if (pageMembers.length < pageSize) {
+          hasMore = false
+        } else {
+          currentPage++
+        }
+      } else {
+        hasMore = false
+      }
+
+      // Safety check - if we've fetched more than expected, break
+      // Remove the arbitrary limit of 10 pages and use actual count
+      if (allMembers.length >= (count || 0)) {
+        hasMore = false
+      }
+    }
 
     return NextResponse.json({
       success: true,
-      members,
+      members: allMembers,
+      total: count,
     })
   } catch (error) {
+    console.error("Error fetching members:", error)
     return NextResponse.json({ success: false, error: error.message }, { status: 500 })
   }
 }
@@ -88,6 +129,7 @@ export async function POST(request) {
 
     return NextResponse.json({ success: true, member })
   } catch (error) {
+    console.error("Error creating member:", error)
     return NextResponse.json({ success: false, error: error.message }, { status: 500 })
   }
 }
