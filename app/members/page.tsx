@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Phone, MapPin, Briefcase, Search, Building, Users } from "lucide-react"
+import { Phone, MapPin, Briefcase, Search, Building, Users, ChevronLeft, ChevronRight } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Label } from "@/components/ui/label"
@@ -18,6 +18,8 @@ export default function MembersPage() {
   const [error, setError] = useState("")
   const [selectedMember, setSelectedMember] = useState(null)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const membersPerPage = 50
 
   useEffect(() => {
     fetchMembers()
@@ -50,9 +52,37 @@ export default function MembersPage() {
       (member.gotra || "").toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredMembers.length / membersPerPage)
+  const startIndex = (currentPage - 1) * membersPerPage
+  const endIndex = startIndex + membersPerPage
+  const currentMembers = filteredMembers.slice(startIndex, endIndex)
+
+  // Reset to first page when search changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm])
+
   const openMemberDialog = (member) => {
     setSelectedMember(member)
     setDialogOpen(true)
+  }
+
+  const goToPage = (page) => {
+    setCurrentPage(page)
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      goToPage(currentPage - 1)
+    }
+  }
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      goToPage(currentPage + 1)
+    }
   }
 
   if (loading) {
@@ -108,17 +138,22 @@ export default function MembersPage() {
           </div>
         </div>
 
-        {/* Members Count */}
+        {/* Members Count and Pagination Info */}
         <div className="text-center mb-8">
           <p className="text-gray-600">
-            Showing {filteredMembers.length} of {members.length} members
+            Showing {startIndex + 1}-{Math.min(endIndex, filteredMembers.length)} of {filteredMembers.length} members
           </p>
+          {totalPages > 1 && (
+            <p className="text-sm text-gray-500 mt-1">
+              Page {currentPage} of {totalPages}
+            </p>
+          )}
         </div>
 
         {/* Members Grid */}
-        {filteredMembers.length > 0 ? (
+        {currentMembers.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredMembers.map((member) => (
+            {currentMembers.map((member) => (
               <Card key={member.id} className="hover:shadow-lg transition-shadow cursor-pointer">
                 <CardHeader className="text-center">
                   <Avatar className="h-20 w-20 mx-auto mb-4">
@@ -130,11 +165,11 @@ export default function MembersPage() {
                     <Badge variant={member.is_active ? "default" : "secondary"}>
                       {member.is_active ? "Active" : "Inactive"}
                     </Badge>
-                    {member.status && (
+                    {/* {member.status && (
                       <Badge variant="outline" className="text-xs">
                         {member.status}
                       </Badge>
-                    )}
+                    )} */}
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-2">
@@ -200,6 +235,81 @@ export default function MembersPage() {
           </div>
         )}
 
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center space-x-2 mt-12">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={goToPreviousPage}
+              disabled={currentPage === 1}
+              className="flex items-center bg-transparent"
+            >
+              <ChevronLeft className="h-4 w-4 mr-1" />
+              Previous
+            </Button>
+
+            {/* Page Numbers */}
+            <div className="flex space-x-1">
+              {/* First page */}
+              {currentPage > 3 && (
+                <>
+                  <Button variant={1 === currentPage ? "default" : "outline"} size="sm" onClick={() => goToPage(1)}>
+                    1
+                  </Button>
+                  {currentPage > 4 && <span className="px-2 py-1 text-gray-500">...</span>}
+                </>
+              )}
+
+              {/* Pages around current page */}
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter(
+                  (page) =>
+                    page === currentPage ||
+                    page === currentPage - 1 ||
+                    page === currentPage + 1 ||
+                    (currentPage <= 2 && page <= 3) ||
+                    (currentPage >= totalPages - 1 && page >= totalPages - 2),
+                )
+                .map((page) => (
+                  <Button
+                    key={page}
+                    variant={page === currentPage ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => goToPage(page)}
+                  >
+                    {page}
+                  </Button>
+                ))}
+
+              {/* Last page */}
+              {currentPage < totalPages - 2 && (
+                <>
+                  {currentPage < totalPages - 3 && <span className="px-2 py-1 text-gray-500">...</span>}
+                  <Button
+                    variant={totalPages === currentPage ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => goToPage(totalPages)}
+                  >
+                    {totalPages}
+                  </Button>
+                </>
+              )}
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={goToNextPage}
+              disabled={currentPage === totalPages}
+              className="flex items-center bg-transparent"
+            >
+              Next
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          </div>
+        )}
+
         {/* Member Details Dialog */}
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -226,7 +336,7 @@ export default function MembersPage() {
                       <Badge variant={selectedMember.is_active ? "default" : "secondary"}>
                         {selectedMember.is_active ? "Active" : "Inactive"}
                       </Badge>
-                      {selectedMember.status && <Badge variant="outline">{selectedMember.status}</Badge>}
+                      {/* {selectedMember.status && <Badge variant="outline">{selectedMember.status}</Badge>} */}
                     </div>
                   </div>
                 </div>

@@ -20,7 +20,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { UserPlus, Edit, Trash2, Eye } from "lucide-react"
+import { UserPlus, Edit, Trash2, Eye, ChevronLeft, ChevronRight } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function MembersManagement() {
@@ -52,16 +52,45 @@ export default function MembersManagement() {
     email: "",
     gotra: "",
     total_members: 1,
-    status: "",
+    status: "active",
     is_active: true,
   })
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
   const [imageFile, setImageFile] = useState(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const membersPerPage = 50
 
   useEffect(() => {
     fetchMembers()
   }, [])
+
+  // Pagination logic
+  const totalPages = Math.ceil(members.length / membersPerPage)
+  const startIndex = (currentPage - 1) * membersPerPage
+  const endIndex = startIndex + membersPerPage
+  const currentMembers = members.slice(startIndex, endIndex)
+
+  // Reset to first page when members data changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [members])
+
+  const goToPage = (page) => {
+    setCurrentPage(page)
+  }
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      goToPage(currentPage - 1)
+    }
+  }
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      goToPage(currentPage + 1)
+    }
+  }
 
   const fetchMembers = async () => {
     try {
@@ -168,7 +197,7 @@ export default function MembersManagement() {
       email: "",
       gotra: "",
       total_members: 1,
-      status: "",
+      status: "active",
       is_active: true,
     })
     setEditingMember(null)
@@ -199,7 +228,7 @@ export default function MembersManagement() {
       email: member.email || "",
       gotra: member.gotra || "",
       total_members: member.total_members || 1,
-      status: member.status || "",
+      status: member.status || "active",
       is_active: member.is_active,
     })
     setDialogOpen(true)
@@ -516,89 +545,186 @@ export default function MembersManagement() {
           </Alert>
         )}
 
+        {/* Members Count and Pagination Info */}
+        {!loading && (
+          <div className="mb-6">
+            <p className="text-gray-600">
+              Showing {startIndex + 1}-{Math.min(endIndex, members.length)} of {members.length} members
+            </p>
+            {totalPages > 1 && (
+              <p className="text-sm text-gray-500 mt-1">
+                Page {currentPage} of {totalPages}
+              </p>
+            )}
+          </div>
+        )}
+
         {loading ? (
           <div className="text-center py-4">Loading members...</div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Member</TableHead>
-                <TableHead>Family Head</TableHead>
-                <TableHead>Business</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {members.map((member) => (
-                <TableRow key={member.id}>
-                  <TableCell>
-                    <div className="flex items-center space-x-3">
-                      <Avatar>
-                        <AvatarImage src={member.image_url || "/placeholder.svg"} />
-                        <AvatarFallback>{(member.family_head_name || member.name || "U").charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <div className="font-medium">{member.name || member.family_head_name}</div>
-                        <div className="text-sm text-gray-500">{member.gotra && `Gotra: ${member.gotra}`}</div>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{member.family_head_name}</div>
-                      <div className="text-sm text-gray-500">
-                        {member.total_members} family member{member.total_members !== 1 ? "s" : ""}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{member.firm_full_name || "N/A"}</div>
-                      <div className="text-sm text-gray-500">{member.business}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm">
-                      {member.mobile_no1 && <div>{member.mobile_no1}</div>}
-                      {member.email && <div className="text-gray-500">{member.email}</div>}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm">
-                      {member.city && <div>{member.city}</div>}
-                      {member.state && <div className="text-gray-500">{member.state}</div>}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <Badge variant={member.is_active ? "default" : "secondary"}>
-                        {member.is_active ? "Active" : "Inactive"}
-                      </Badge>
-                      {/* <Badge variant="outline" className="text-xs">
-                        {member.status}
-                      </Badge> */}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <Button size="sm" variant="outline" onClick={() => openViewDialog(member)}>
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={() => openEditDialog(member)}>
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button size="sm" variant="destructive" onClick={() => handleDelete(member.id)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
+          <>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Member</TableHead>
+                  <TableHead>Family Head</TableHead>
+                  <TableHead>Business</TableHead>
+                  <TableHead>Contact</TableHead>
+                  <TableHead>Location</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {currentMembers.map((member) => (
+                  <TableRow key={member.id}>
+                    <TableCell>
+                      <div className="flex items-center space-x-3">
+                        <Avatar>
+                          <AvatarImage src={member.image_url || "/placeholder.svg"} />
+                          <AvatarFallback>{(member.family_head_name || member.name || "U").charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <div className="font-medium">{member.name || member.family_head_name}</div>
+                          <div className="text-sm text-gray-500">{member.gotra && `Gotra: ${member.gotra}`}</div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{member.family_head_name}</div>
+                        <div className="text-sm text-gray-500">
+                          {member.total_members} family member{member.total_members !== 1 ? "s" : ""}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{member.firm_full_name || "N/A"}</div>
+                        <div className="text-sm text-gray-500">{member.business}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm">
+                        {member.mobile_no1 && <div>{member.mobile_no1}</div>}
+                        {member.email && <div className="text-gray-500">{member.email}</div>}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm">
+                        {member.city && <div>{member.city}</div>}
+                        {member.state && <div className="text-gray-500">{member.state}</div>}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-1">
+                        <Badge variant={member.is_active ? "default" : "secondary"}>
+                          {member.is_active ? "Active" : "Inactive"}
+                        </Badge>
+                        {/* <Badge variant="outline" className="text-xs">
+                          {member.status}
+                        </Badge> */}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2">
+                        <Button size="sm" variant="outline" onClick={() => openViewDialog(member)}>
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => openEditDialog(member)}>
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button size="sm" variant="destructive" onClick={() => handleDelete(member.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center space-x-2 mt-8">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={goToPreviousPage}
+                  disabled={currentPage === 1}
+                  className="flex items-center bg-transparent"
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  Previous
+                </Button>
+
+                {/* Page Numbers */}
+                <div className="flex space-x-1">
+                  {/* First page */}
+                  {currentPage > 3 && (
+                    <>
+                      <Button variant={1 === currentPage ? "default" : "outline"} size="sm" onClick={() => goToPage(1)}>
+                        1
+                      </Button>
+                      {currentPage > 4 && <span className="px-2 py-1 text-gray-500">...</span>}
+                    </>
+                  )}
+
+                  {/* Pages around current page */}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter(
+                      (page) =>
+                        page === currentPage ||
+                        page === currentPage - 1 ||
+                        page === currentPage + 1 ||
+                        (currentPage <= 2 && page <= 3) ||
+                        (currentPage >= totalPages - 1 && page >= totalPages - 2),
+                    )
+                    .map((page) => (
+                      <Button
+                        key={page}
+                        variant={page === currentPage ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => goToPage(page)}
+                      >
+                        {page}
+                      </Button>
+                    ))}
+
+                  {/* Last page */}
+                  {currentPage < totalPages - 2 && (
+                    <>
+                      {currentPage < totalPages - 3 && <span className="px-2 py-1 text-gray-500">...</span>}
+                      <Button
+                        variant={totalPages === currentPage ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => goToPage(totalPages)}
+                      >
+                        {totalPages}
+                      </Button>
+                    </>
+                  )}
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={goToNextPage}
+                  disabled={currentPage === totalPages}
+                  className="flex items-center bg-transparent"
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </div>
+            )}
+          </>
+        )}
+
+        {members.length === 0 && !loading && (
+          <div className="text-center py-8">
+            <p className="text-gray-500">No members added yet. Add your first member to get started!</p>
+          </div>
         )}
 
         {/* View Member Dialog */}
@@ -736,7 +862,7 @@ export default function MembersManagement() {
                     <Badge variant={viewingMember.is_active ? "default" : "secondary"}>
                       {viewingMember.is_active ? "Active" : "Inactive"}
                     </Badge>
-                    <Badge variant="outline">{viewingMember.status}</Badge>
+                    {/* <Badge variant="outline">{viewingMember.status}</Badge> */}
                   </div>
                   <div className="text-sm text-gray-500">
                     Member since:{" "}

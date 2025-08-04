@@ -45,7 +45,7 @@ export default function ContactPage() {
                   <Phone className="h-6 w-6 text-orange-600 mt-1" />
                   <div>
                     <h3 className="font-medium">Phone</h3>
-                    <p className="text-gray-600">+91 98765 43210</p>
+                    <p className="text-gray-600">+91 98265 17676</p>
                     <p className="text-gray-600">+91 98765 43211</p>
                   </div>
                 </div>
@@ -116,7 +116,7 @@ export default function ContactPage() {
 
                 <div>
                   <Label htmlFor="phone">Phone Number</Label>
-                  <Input id="phone" type="tel" placeholder="+91 98765 43210" />
+                  <Input id="phone" type="tel" placeholder="+91 98265 17676" />
                 </div>
 
                 <div>

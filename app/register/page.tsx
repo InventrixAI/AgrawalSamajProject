@@ -166,7 +166,7 @@ export default function RegisterPage() {
                   type="tel"
                   value={formData.phone}
                   onChange={handleChange}
-                  placeholder="+91 98765 43210"
+                  placeholder="+91 98265 17676"
                 />
               </div>
 

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Search, Phone, MapPin, Briefcase, Building, Users } from "lucide-react"
+import { Search, Phone, MapPin, Briefcase, Building, Users, ChevronLeft, ChevronRight } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Label } from "@/components/ui/label"
@@ -18,6 +18,8 @@ export default function MemberDashboard() {
   const [user, setUser] = useState(null)
   const [selectedMember, setSelectedMember] = useState(null)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const membersPerPage = 50
 
   useEffect(() => {
     // Check if user is logged in
@@ -51,9 +53,41 @@ export default function MemberDashboard() {
       (member.gotra || "").toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredMembers.length / membersPerPage)
+  const startIndex = (currentPage - 1) * membersPerPage
+  const endIndex = startIndex + membersPerPage
+  const currentMembers = filteredMembers.slice(startIndex, endIndex)
+
+  // Reset to first page when search changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm])
+
   const openMemberDialog = (member) => {
     setSelectedMember(member)
     setDialogOpen(true)
+  }
+
+  const goToPage = (page) => {
+    setCurrentPage(page)
+    // Scroll to members section
+    const membersSection = document.getElementById("members-section")
+    if (membersSection) {
+      membersSection.scrollIntoView({ behavior: "smooth" })
+    }
+  }
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      goToPage(currentPage - 1)
+    }
+  }
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      goToPage(currentPage + 1)
+    }
   }
 
   if (!user) {
@@ -78,91 +112,193 @@ export default function MemberDashboard() {
           <p className="text-gray-600">Welcome back, {user.name || user.email}!</p>
         </div>
 
-        {/* Search */}
-        <div className="mb-8">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              placeholder="Search members..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+        {/* Members Section */}
+        <div id="members-section">
+          {/* Search */}
+          <div className="mb-8">
+            <div className="relative max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                placeholder="Search members..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
           </div>
+
+          {/* Members Count and Pagination Info */}
+          {!loading && (
+            <div className="mb-6">
+              <p className="text-gray-600">
+                Showing {startIndex + 1}-{Math.min(endIndex, filteredMembers.length)} of {filteredMembers.length}{" "}
+                members
+              </p>
+              {totalPages > 1 && (
+                <p className="text-sm text-gray-500 mt-1">
+                  Page {currentPage} of {totalPages}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Members Grid */}
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto mb-4"></div>
+              <p>Loading members...</p>
+            </div>
+          ) : currentMembers.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {currentMembers.map((member) => (
+                <Card key={member.id} className="hover:shadow-lg transition-shadow">
+                  <CardHeader className="text-center">
+                    <Avatar className="h-20 w-20 mx-auto mb-4">
+                      <AvatarImage src={member.image_url || "/placeholder.svg"} />
+                      <AvatarFallback>{(member.family_head_name || member.name || "U").charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <CardTitle className="text-lg">{member.family_head_name || member.name}</CardTitle>
+                    <Badge variant={member.is_active ? "default" : "secondary"}>
+                      {member.is_active ? "Active" : "Inactive"}
+                    </Badge>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {member.firm_full_name && (
+                      <div className="flex items-center text-sm text-gray-600">
+                        <Building className="h-4 w-4 mr-2" />
+                        {member.firm_full_name}
+                      </div>
+                    )}
+                    {member.business && (
+                      <div className="flex items-center text-sm text-gray-600">
+                        <Briefcase className="h-4 w-4 mr-2" />
+                        {member.business}
+                      </div>
+                    )}
+                    {member.mobile_no1 && (
+                      <div className="flex items-center text-sm text-gray-600">
+                        <Phone className="h-4 w-4 mr-2" />
+                        {member.mobile_no1}
+                      </div>
+                    )}
+                    {member.city && (
+                      <div className="flex items-center text-sm text-gray-600">
+                        <MapPin className="h-4 w-4 mr-2" />
+                        {member.city}
+                      </div>
+                    )}
+                    {member.total_members && (
+                      <div className="flex items-center text-xs text-gray-500">
+                        <Users className="h-3 w-3 mr-1" />
+                        {member.total_members} family member{member.total_members !== 1 ? "s" : ""}
+                      </div>
+                    )}
+                    <div className="text-xs text-gray-500 pt-2">
+                      Member since: {new Date(member.membership_date || member.created_at).toLocaleDateString()}
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full mt-3 bg-transparent"
+                      onClick={() => openMemberDialog(member)}
+                    >
+                      View Details
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg">
+                {searchTerm ? "No members found matching your search." : "No members found."}
+              </p>
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm("")}
+                  className="mt-4 text-orange-600 hover:text-orange-700 underline"
+                >
+                  Clear search
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center space-x-2 mt-12">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={goToPreviousPage}
+                disabled={currentPage === 1}
+                className="flex items-center bg-transparent"
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                Previous
+              </Button>
+
+              {/* Page Numbers */}
+              <div className="flex space-x-1">
+                {/* First page */}
+                {currentPage > 3 && (
+                  <>
+                    <Button variant={1 === currentPage ? "default" : "outline"} size="sm" onClick={() => goToPage(1)}>
+                      1
+                    </Button>
+                    {currentPage > 4 && <span className="px-2 py-1 text-gray-500">...</span>}
+                  </>
+                )}
+
+                {/* Pages around current page */}
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter(
+                    (page) =>
+                      page === currentPage ||
+                      page === currentPage - 1 ||
+                      page === currentPage + 1 ||
+                      (currentPage <= 2 && page <= 3) ||
+                      (currentPage >= totalPages - 1 && page >= totalPages - 2),
+                  )
+                  .map((page) => (
+                    <Button
+                      key={page}
+                      variant={page === currentPage ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => goToPage(page)}
+                    >
+                      {page}
+                    </Button>
+                  ))}
+
+                {/* Last page */}
+                {currentPage < totalPages - 2 && (
+                  <>
+                    {currentPage < totalPages - 3 && <span className="px-2 py-1 text-gray-500">...</span>}
+                    <Button
+                      variant={totalPages === currentPage ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => goToPage(totalPages)}
+                    >
+                      {totalPages}
+                    </Button>
+                  </>
+                )}
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={goToNextPage}
+                disabled={currentPage === totalPages}
+                className="flex items-center bg-transparent"
+              >
+                Next
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </div>
+          )}
         </div>
-
-        {/* Members Grid */}
-        {loading ? (
-          <div className="text-center py-12">
-            <p>Loading members...</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredMembers.map((member) => (
-              <Card key={member.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader className="text-center">
-                  <Avatar className="h-20 w-20 mx-auto mb-4">
-                    <AvatarImage src={member.image_url || "/placeholder.svg"} />
-                    <AvatarFallback>{(member.family_head_name || member.name || "U").charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <CardTitle className="text-lg">{member.family_head_name || member.name}</CardTitle>
-                  <Badge variant={member.is_active ? "default" : "secondary"}>
-                    {member.is_active ? "Active" : "Inactive"}
-                  </Badge>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  {member.firm_full_name && (
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Building className="h-4 w-4 mr-2" />
-                      {member.firm_full_name}
-                    </div>
-                  )}
-                  {member.business && (
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Briefcase className="h-4 w-4 mr-2" />
-                      {member.business}
-                    </div>
-                  )}
-                  {member.mobile_no1 && (
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Phone className="h-4 w-4 mr-2" />
-                      {member.mobile_no1}
-                    </div>
-                  )}
-                  {member.city && (
-                    <div className="flex items-center text-sm text-gray-600">
-                      <MapPin className="h-4 w-4 mr-2" />
-                      {member.city}
-                    </div>
-                  )}
-                  {member.total_members && (
-                    <div className="flex items-center text-xs text-gray-500">
-                      <Users className="h-3 w-3 mr-1" />
-                      {member.total_members} family member{member.total_members !== 1 ? "s" : ""}
-                    </div>
-                  )}
-                  <div className="text-xs text-gray-500 pt-2">
-                    Member since: {new Date(member.membership_date || member.created_at).toLocaleDateString()}
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full mt-3 bg-transparent"
-                    onClick={() => openMemberDialog(member)}
-                  >
-                    View Details
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-
-        {filteredMembers.length === 0 && !loading && (
-          <div className="text-center py-12">
-            <p className="text-gray-500">No members found matching your search.</p>
-          </div>
-        )}
 
         {/* Member Details Dialog */}
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
