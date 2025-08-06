@@ -46,7 +46,7 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-medium">Phone</h3>
                     <p className="text-gray-600">+91 98265 17676</p>
-                    <p className="text-gray-600">+91 98765 43211</p>
+                    
                   </div>
                 </div>
 
@@ -54,8 +54,8 @@ export default function ContactPage() {
                   <Mail className="h-6 w-6 text-orange-600 mt-1" />
                   <div>
                     <h3 className="font-medium">Email</h3>
-                    <p className="text-gray-600">info@bilaspuragrawalsabha.com</p>
-                    <p className="text-gray-600">president@bilaspuragrawalsabha.com</p>
+                    <p className="text-gray-600">dmodi6@gmail.com</p>
+                    
                   </div>
                 </div>
 

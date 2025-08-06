@@ -4,11 +4,10 @@ import bcrypt from "bcryptjs"
 
 export async function PUT(request, { params }) {
   try {
-    const { email, password, role, is_approved } = await request.json()
+    const {  password, role, is_approved } = await request.json()
     const { id } = params
 
     const updateData = {
-      email,
       role,
       is_approved,
       updated_at: new Date().toISOString(),

@@ -22,27 +22,27 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/about" className="text-gray-300 hover:text-white">
-                  About Us
+                  हमारे बारे में
                 </Link>
               </li>
               <li>
                 <Link href="/events" className="text-gray-300 hover:text-white">
-                  Events
+                  कार्यक्रम
                 </Link>
               </li>
               <li>
                 <Link href="/members" className="text-gray-300 hover:text-white">
-                  Members
+                  समाज लिस्ट
                 </Link>
               </li>
               <li>
                 <Link href="/committees" className="text-gray-300 hover:text-white">
-                  Committees
+                  सभा / समितियां
                 </Link>
               </li>
               <li>
                 <Link href="/contact" className="text-gray-300 hover:text-white">
-                  Contact
+                  संपर्क करें
                 </Link>
               </li>
             </ul>
@@ -89,7 +89,7 @@ export default function Footer() {
               </div>
               <div className="flex items-center">
                 <Mail size={16} className="mr-2" />
-                <span className="text-gray-300">info@bilaspuragrawalsabha.com</span>
+                <span className="text-gray-300">dmodi6@gmail.com</span>
               </div>
             </div>
 

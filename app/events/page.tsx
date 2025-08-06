@@ -109,7 +109,7 @@ export default function EventsPage() {
                       <img
                         src={event.image_url || "/placeholder.svg"}
                         alt={event.title}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full contain"
                       />
                     ) : (
                       <span className="text-gray-500">Event Image</span>
@@ -142,8 +142,10 @@ export default function EventsPage() {
                         </div>
                       )}
                     </div>
+                    <br></br>
 
-                    <Button className="w-full mt-4">Register for Event</Button>
+                    <p className="text-black-300 text-sm">इस कार्यक्रम में भाग लेगे हेतु
+                      इस मोबाइल नंबर पर संपर्क करे : +919826517676 </p>
                   </CardContent>
                 </Card>
               ))}
@@ -220,7 +222,7 @@ export default function EventsPage() {
           <p className="text-gray-600 mb-6">
             Have an idea for a community event? Get in touch with our events committee.
           </p>
-          <Button>Contact Events Committee</Button>
+          <p className="text-black-300 text-sm">कार्यक्रम के आयोजन हेतु इस मोबाइल नंबर पर संपर्क करे : +919826517676</p>
         </section>
       </div>
     </div>

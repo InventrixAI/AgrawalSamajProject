@@ -31,32 +31,12 @@ export default function Navbar() {
     const userData = localStorage.getItem("user")
     if (userData) {
       try {
-        const parsedUser = JSON.parse(userData)
-        setLoggedInUser(parsedUser)
+        setLoggedInUser(JSON.parse(userData))
       } catch (e) {
         console.error("Failed to parse user data from localStorage", e)
         localStorage.removeItem("user") // Clear invalid data
       }
     }
-
-    // Listen for storage changes (when user logs in/out in another tab)
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "user") {
-        if (e.newValue) {
-          try {
-            setLoggedInUser(JSON.parse(e.newValue))
-          } catch (error) {
-            console.error("Failed to parse user data from storage event", error)
-            setLoggedInUser(null)
-          }
-        } else {
-          setLoggedInUser(null)
-        }
-      }
-    }
-
-    window.addEventListener("storage", handleStorageChange)
-    return () => window.removeEventListener("storage", handleStorageChange)
   }, [])
 
   const handleLogout = () => {
@@ -66,12 +46,12 @@ export default function Navbar() {
   }
 
   const navItems = [
-    { href: "/", label: "Home" },
-    { href: "/about", label: "About" },
-    { href: "/events", label: "Events" },
-    { href: "/members", label: "Members" },
-    { href: "/committees", label: "Committees" },
-    { href: "/contact", label: "Contact" },
+    { href: "/", label:"होम" },
+    { href: "/about", label: "हमारे बारे में" },
+    { href: "/events", label: "कार्यक्रम" },
+    { href: "/members", label: "समाज लिस्ट" },
+    { href: "/committees", label: "सभा / समितियां" },
+    { href: "/contact", label: "संपर्क करें" },
   ]
 
   return (
@@ -79,8 +59,12 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link href="/" className="text-xl font-bold text-orange-600">
-              Bilaspur Agrawal Sabha
+            <Link href="/" className="text-xl font-bold text-orange-600 object-contain">
+              <img
+              src="/logo.jpg"
+              alt="Bilaspur Agrawal Sabha"
+              className="h-10 w-auto object-contain"
+            />
             </Link>
           </div>
 
@@ -96,7 +80,7 @@ export default function Navbar() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src="/placeholder-user.jpg" alt="User Avatar" />
+                      <AvatarImage src="/placeholder-user.jpg" alt="User Avatar" /> {/* Placeholder for user image */}
                       <AvatarFallback>
                         {loggedInUser.name
                           ? loggedInUser.name.charAt(0).toUpperCase()
@@ -126,7 +110,7 @@ export default function Navbar() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <div>
+              <>
                 <Link href="/login">
                   <Button variant="outline" size="sm">
                     Login
@@ -135,7 +119,7 @@ export default function Navbar() {
                 <Link href="/register">
                   <Button size="sm">Join Us</Button>
                 </Link>
-              </div>
+              </>
             )}
           </div>
 
@@ -162,7 +146,7 @@ export default function Navbar() {
                 </Link>
               ))}
               {loggedInUser ? (
-                <div>
+                <>
                   <Link
                     href={loggedInUser.role === "admin" ? "/admin" : "/dashboard"}
                     className="block px-3 py-2 text-gray-700 hover:text-orange-600"
@@ -179,7 +163,7 @@ export default function Navbar() {
                   >
                     Log out ({loggedInUser.name || loggedInUser.email})
                   </button>
-                </div>
+                </>
               ) : (
                 <div className="flex space-x-2 px-3 py-2">
                   <Link href="/login">

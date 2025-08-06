@@ -421,8 +421,7 @@ export default function UsersManagement() {
                   </div>
                 </div>
                 <div className="text-sm text-gray-600 bg-yellow-50 border border-yellow-200 rounded p-2">
-                  <strong>⚠️ Important:</strong> Please share this password securely with the user. They should change it
-                  after their first login.
+                  <strong>⚠️ Important:</strong> Please share this password securely with the user.
                 </div>
                 <Button size="sm" variant="outline" onClick={() => setNewPassword("")} className="mt-2">
                   Dismiss

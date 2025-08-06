@@ -20,7 +20,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { UserPlus, Edit, Trash2, Eye, ChevronLeft, ChevronRight } from "lucide-react"
+import { UserPlus, Edit, Trash2, Eye, ChevronLeft, ChevronRight,Search } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function MembersManagement() {
@@ -30,6 +30,7 @@ export default function MembersManagement() {
   const [viewDialogOpen, setViewDialogOpen] = useState(false)
   const [editingMember, setEditingMember] = useState(null)
   const [viewingMember, setViewingMember] = useState(null)
+  const [searchTerm, setSearchTerm] = useState("")
   const [formData, setFormData] = useState({
     name: "",
     firm_full_name: "",
@@ -63,7 +64,7 @@ export default function MembersManagement() {
 
   useEffect(() => {
     fetchMembers()
-  }, [])
+  }, [currentPage, searchTerm])
 
   // Pagination logic
   const totalPages = Math.ceil(members.length / membersPerPage)
@@ -94,7 +95,13 @@ export default function MembersManagement() {
 
   const fetchMembers = async () => {
     try {
-      const response = await fetch("/api/admin/members")
+      setLoading(true)
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: membersPerPage.toString(),
+        search: searchTerm,
+      })
+      const response = await fetch(`/api/admin/members?${params}`)
       const data = await response.json()
       if (data.success) {
         setMembers(data.members)
@@ -104,6 +111,11 @@ export default function MembersManagement() {
     } finally {
       setLoading(false)
     }
+  }
+
+   const handleSearch = (value) => {
+    setSearchTerm(value)
+    setCurrentPage(1) // Reset to first page when searching
   }
 
   const handleSubmit = async (e) => {
@@ -539,6 +551,16 @@ export default function MembersManagement() {
         </div>
       </CardHeader>
       <CardContent>
+        <div className="flex items-center space-x-2 mb-4">
+          <Search className="h-4 w-4 text-gray-500" />
+          <Input
+            placeholder="Search members..."
+            value={searchTerm}
+            onChange={(e) => handleSearch(e.target.value)}
+            className="max-w-sm"
+          />
+        </div>
+
         {success && (
           <Alert className="mb-4">
             <AlertDescription>{success}</AlertDescription>

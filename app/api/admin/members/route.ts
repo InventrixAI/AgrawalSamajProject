@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server"
 import { createServerClient } from "@/lib/supabase"
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url)
+    const page = Number.parseInt(searchParams.get("page") || "1")
+    const limit = Number.parseInt(searchParams.get("limit") || "50")
+    const search = searchParams.get("search") || ""
     const supabase = createServerClient()
 
     // Get total count first
@@ -16,13 +20,21 @@ export async function GET() {
     let currentPage = 0
     let hasMore = true
 
+    let query = supabase
+          .from("members")
+        .select("*", { count: "exact" })
+
+    if (search) {
+      query = query.or(`name.ilike.%${search}%,firm_full_name.ilike.%${search}%,family_head_name.ilike.%${search}%,firm_address.ilike.%${search}%,firm_city.ilike.%${search}%,state.ilike.%${search}%,city.ilike.%${search}%,business.ilike.%${search}%,gotra.ilike.%${search}%,home_address.ilike.%${search}%`)
+    }
+
+
+
     while (hasMore) {
       const start = currentPage * pageSize
       const end = start + pageSize - 1
 
-      const { data: pageMembers, error } = await supabase
-        .from("members")
-        .select("*")
+      const { data: pageMembers, error } = await query
         .order("family_head_name")
         .range(start, end)
 
