@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { supabase } from "@/lib/supabase"
+import { supabase, createServerClient } from "@/lib/supabase"
 import bcrypt from "bcryptjs"
 
 export async function GET(request: Request) {
@@ -48,12 +48,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Email and password are required" }, { status: 400 })
     }
 
+    const normalizedEmail = String(email).trim().toLowerCase()
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    const { data: user, error } = await supabase
+    const server = createServerClient()
+    const { data: user, error } = await server
       .from("users")
       .insert({
-        email,
+        email: normalizedEmail,
         password_hash: hashedPassword,
         role: role || "member",
         is_approved: is_approved || false,

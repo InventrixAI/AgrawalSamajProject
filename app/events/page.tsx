@@ -5,9 +5,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Calendar, MapPin, Clock } from "lucide-react"
+import { AspectRatio } from "@/components/ui/aspect-ratio"
+
+type EventItem = {
+  id: string
+  title: string
+  description?: string
+  event_date: string
+  location?: string
+  image_url?: string
+}
 
 export default function EventsPage() {
-  const [events, setEvents] = useState([])
+  const [events, setEvents] = useState<EventItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
 
@@ -104,16 +114,20 @@ export default function EventsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {upcomingEvents.map((event) => (
                 <Card key={event.id} className="overflow-hidden">
-                  <div className="h-48 bg-gray-200 flex items-center justify-center">
-                    {event.image_url ? (
-                      <img
-                        src={event.image_url || "/placeholder.svg"}
-                        alt={event.title}
-                        className="w-full h-full contain"
-                      />
-                    ) : (
-                      <span className="text-gray-500">Event Image</span>
-                    )}
+                  <div className="bg-gray-200">
+                    <AspectRatio ratio={148 / 210}>
+                      {event.image_url ? (
+                        <img
+                          src={event.image_url || "/placeholder.svg"}
+                          alt={event.title}
+                          className="w-full h-full object-contain"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span className="text-gray-500">Event Image</span>
+                        </div>
+                      )}
+                    </AspectRatio>
                   </div>
                   <CardHeader>
                     <div className="flex justify-between items-start">
@@ -167,16 +181,20 @@ export default function EventsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {pastEvents.map((event) => (
                 <Card key={event.id} className="overflow-hidden opacity-75">
-                  <div className="h-48 bg-gray-200 flex items-center justify-center">
-                    {event.image_url ? (
-                      <img
-                        src={event.image_url || "/placeholder.svg"}
-                        alt={event.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-gray-500">Event Image</span>
-                    )}
+                  <div className="bg-gray-200">
+                    <AspectRatio ratio={148 / 210}>
+                      {event.image_url ? (
+                        <img
+                          src={event.image_url || "/placeholder.svg"}
+                          alt={event.title}
+                          className="w-full h-full object-contain"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span className="text-gray-500">Event Image</span>
+                        </div>
+                      )}
+                    </AspectRatio>
                   </div>
                   <CardHeader>
                     <div className="flex justify-between items-start">

@@ -1,24 +1,33 @@
 import { NextResponse } from "next/server"
-import { supabase } from "@/lib/supabase"
+import { createServerClient } from "@/lib/supabase"
 import bcrypt from "bcryptjs"
 
 export async function PUT(request, { params }) {
   try {
-    const {  password, role, is_approved } = await request.json()
+    const { email, password, role, is_approved } = await request.json()
     const { id } = params
 
-    const updateData = {
-      role,
-      is_approved,
+    const updateData: Record<string, unknown> = {
       updated_at: new Date().toISOString(),
     }
+
+    if (role !== undefined) updateData.role = role
+    if (is_approved !== undefined) updateData.is_approved = is_approved
+    if (email) updateData.email = String(email).trim().toLowerCase()
 
     // Only update password if provided
     if (password) {
       updateData.password_hash = await bcrypt.hash(password, 10)
     }
 
-    const { data: user, error } = await supabase.from("users").update(updateData).eq("id", id).select().single()
+    const supabase = createServerClient()
+
+    const { data: user, error } = await supabase
+      .from("users")
+      .update(updateData)
+      .eq("id", id)
+      .select()
+      .single()
 
     if (error) throw error
 

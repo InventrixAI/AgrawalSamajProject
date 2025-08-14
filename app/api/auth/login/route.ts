@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: "Email and password are required" }, { status: 400 })
     }
 
-    const result = await signIn(email, password)
+    const result = await signIn(String(email).trim().toLowerCase(), password)
 
     if (result.success) {
       return NextResponse.json({

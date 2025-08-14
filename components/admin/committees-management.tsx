@@ -16,35 +16,47 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Plus, Edit, Trash2, Users, UserPlus } from "lucide-react"
+import { Plus, Edit, Trash2, FileUp, FileText } from "lucide-react"
+
+type CommitteeMember = {
+  id: string
+  name: string
+  image_url?: string
+  position?: string
+  committee_member_id?: string
+}
+
+type Committee = {
+  id: string
+  name: string
+  description?: string
+  image_url?: string
+  is_active: boolean
+  members?: CommitteeMember[]
+  pdf_url?: string
+}
 
 export default function CommitteesManagement() {
-  const [committees, setCommittees] = useState([])
-  const [members, setMembers] = useState([])
+  const [committees, setCommittees] = useState<Committee[]>([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [memberDialogOpen, setMemberDialogOpen] = useState(false)
-  const [editingCommittee, setEditingCommittee] = useState(null)
-  const [selectedCommittee, setSelectedCommittee] = useState(null)
+  const [editingCommittee, setEditingCommittee] = useState<Committee | null>(null)
+  const [pdfUploadingId, setPdfUploadingId] = useState<string | null>(null)
+  const [pdfDialogOpen, setPdfDialogOpen] = useState(false)
+  const [selectedPdfUrl, setSelectedPdfUrl] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     is_active: true,
   })
-  const [memberFormData, setMemberFormData] = useState({
-    member_id: "",
-    position: "",
-  })
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
-  const [imageFile, setImageFile] = useState(null)
+  const [imageFile, setImageFile] = useState<File | null>(null)
 
   useEffect(() => {
     fetchCommittees()
-    fetchMembers()
   }, [])
 
   const fetchCommittees = async () => {
@@ -61,19 +73,9 @@ export default function CommitteesManagement() {
     }
   }
 
-  const fetchMembers = async () => {
-    try {
-      const response = await fetch("/api/admin/members")
-      const data = await response.json()
-      if (data.success) {
-        setMembers(data.members.filter((m) => m.is_active))
-      }
-    } catch (error) {
-      console.error("Error fetching members:", error)
-    }
-  }
+  // Members APIs are deprecated in favor of PDF upload for committees
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError("")
     setSuccess("")
@@ -121,53 +123,95 @@ export default function CommitteesManagement() {
     }
   }
 
-  const handleAddMember = async (e) => {
-    e.preventDefault()
+  const handleUploadPdf = async (committee: Committee, file: File) => {
     setError("")
+    setSuccess("")
+    if (!file) return
+    if (file.type !== "application/pdf") {
+      setError("Please upload a PDF file")
+      return
+    }
 
     try {
-      const response = await fetch(`/api/admin/committees/${selectedCommittee.id}/members`, {
-        method: "POST",
+      setPdfUploadingId(committee.id)
+      const formData = new FormData()
+      formData.append("file", file)
+
+      const uploadResponse = await fetch("/api/upload", { method: "POST", body: formData })
+      const uploadData = await uploadResponse.json()
+      if (!uploadData.success) {
+        setError(uploadData.error || "Failed to upload PDF")
+        setPdfUploadingId(null)
+        return
+      }
+
+      const updateResponse = await fetch(`/api/admin/committees/${committee.id}`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(memberFormData),
+        body: JSON.stringify({ pdf_url: uploadData.url }),
       })
-
-      const data = await response.json()
-
-      if (data.success) {
-        setSuccess("Member added to committee successfully")
-        setMemberDialogOpen(false)
-        setMemberFormData({ member_id: "", position: "" })
+      const updateData = await updateResponse.json()
+      if (updateData.success) {
+        setSuccess("PDF uploaded successfully")
         fetchCommittees()
       } else {
-        setError(data.error)
+        setError(updateData.error || "Failed to save PDF URL")
       }
-    } catch (error) {
-      setError("An error occurred")
+    } catch (err) {
+      setError("An error occurred while uploading PDF")
+    } finally {
+      setPdfUploadingId(null)
     }
   }
 
-  const handleRemoveMember = async (committeeId, memberId) => {
-    if (!confirm("Are you sure you want to remove this member from the committee?")) return
+  const triggerPdfSelect = (committee: Committee) => {
+    const input = document.createElement("input")
+    input.type = "file"
+    input.accept = "application/pdf"
+    input.onchange = (e: Event) => {
+      const target = e.target as HTMLInputElement
+      const file = target.files && target.files[0]
+      if (file) {
+        handleUploadPdf(committee, file)
+      }
+    }
+    // Append to body to ensure click works across browsers
+    document.body.appendChild(input)
+    input.click()
+    // Clean up
+    input.addEventListener("blur", () => {
+      input.remove()
+    })
+  }
 
+  const handleRemovePdf = async (committee: Committee) => {
+    if (!confirm("Remove the PDF for this committee?")) return
+    setError("")
+    setSuccess("")
     try {
-      const response = await fetch(`/api/admin/committees/${committeeId}/members/${memberId}`, {
-        method: "DELETE",
+      setPdfUploadingId(committee.id)
+      const updateResponse = await fetch(`/api/admin/committees/${committee.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pdf_url: null }),
       })
-
-      const data = await response.json()
-      if (data.success) {
+      const updateData = await updateResponse.json()
+      if (updateData.success) {
+        setSuccess("PDF removed successfully")
         fetchCommittees()
-        setSuccess("Member removed from committee successfully")
       } else {
-        setError(data.error)
+        setError(updateData.error || "Failed to remove PDF")
       }
-    } catch (error) {
-      setError("Error removing member")
+    } catch (err) {
+      setError("An error occurred while removing PDF")
+    } finally {
+      setPdfUploadingId(null)
     }
   }
 
-  const handleDelete = async (committeeId) => {
+  // Member removal disabled as members view is replaced by PDF
+
+  const handleDelete = async (committeeId: string) => {
     if (!confirm("Are you sure you want to delete this committee?")) return
 
     try {
@@ -197,7 +241,7 @@ export default function CommitteesManagement() {
     setImageFile(null)
   }
 
-  const openEditDialog = (committee) => {
+  const openEditDialog = (committee: Committee) => {
     setEditingCommittee(committee)
     setFormData({
       name: committee.name,
@@ -207,10 +251,7 @@ export default function CommitteesManagement() {
     setDialogOpen(true)
   }
 
-  const openMemberDialog = (committee) => {
-    setSelectedCommittee(committee)
-    setMemberDialogOpen(true)
-  }
+  // Member dialog disabled
 
   return (
     <div className="space-y-6">
@@ -219,7 +260,7 @@ export default function CommitteesManagement() {
           <div className="flex justify-between items-center">
             <div>
               <CardTitle>Committees Management</CardTitle>
-              <CardDescription>Manage committees and their members</CardDescription>
+              <CardDescription>Manage committees and their PDF documents</CardDescription>
             </div>
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
@@ -265,11 +306,14 @@ export default function CommitteesManagement() {
 
                     <div>
                       <Label htmlFor="image">Committee Image</Label>
-                      <Input
+                     <Input
                         id="image"
                         type="file"
                         accept="image/*"
-                        onChange={(e) => setImageFile(e.target.files[0])}
+                         onChange={(e) => {
+                           const files = e.target.files
+                           setImageFile(files && files[0] ? files[0] : null)
+                         }}
                       />
                     </div>
 
@@ -323,10 +367,15 @@ export default function CommitteesManagement() {
                           </Badge>
                         </div>
                       </div>
-                      <div className="flex space-x-2">
-                        <Button size="sm" variant="outline" onClick={() => openMemberDialog(committee)}>
-                          <UserPlus className="h-4 w-4" />
-                        </Button>
+                       <div className="flex space-x-2">
+                         <Button size="sm" variant="outline" onClick={() => triggerPdfSelect(committee)} disabled={pdfUploadingId === committee.id}>
+                           <FileUp className="h-4 w-4" />
+                         </Button>
+                         {committee.pdf_url && (
+                           <Button size="sm" variant="outline" onClick={() => handleRemovePdf(committee)} disabled={pdfUploadingId === committee.id}>
+                             Remove PDF
+                           </Button>
+                         )}
                         <Button size="sm" variant="outline" onClick={() => openEditDialog(committee)}>
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -340,36 +389,35 @@ export default function CommitteesManagement() {
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <h4 className="font-medium flex items-center">
-                          <Users className="h-4 w-4 mr-2" />
-                          Committee Members ({committee.members?.length || 0})
+                          <FileText className="h-4 w-4 mr-2" />
+                          Committee PDF
                         </h4>
+                        {committee.pdf_url && (
+                          <a
+                            href={committee.pdf_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm underline"
+                          >
+                            Open in new tab
+                          </a>
+                        )}
                       </div>
-                      {committee.members && committee.members.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {committee.members.map((member) => (
-                            <div key={member.id} className="flex items-center justify-between p-2 border rounded">
-                              <div className="flex items-center space-x-2">
-                                <Avatar className="h-8 w-8">
-                                  <AvatarImage src={member.image_url || "/placeholder.svg"} />
-                                  <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
-                                </Avatar>
-                                <div>
-                                  <div className="text-sm font-medium">{member.name}</div>
-                                  <div className="text-xs text-gray-500">{member.position}</div>
-                                </div>
-                              </div>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handleRemoveMember(committee.id, member.id)}
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          ))}
+                      {committee.pdf_url ? (
+                        <div
+                          className="relative border rounded overflow-hidden cursor-pointer group"
+                          onClick={() => {
+                            setSelectedPdfUrl(committee.pdf_url as string)
+                            setPdfDialogOpen(true)
+                          }}
+                        >
+                          <iframe src={committee.pdf_url} className="w-full h-[240px] pointer-events-none" />
+                          <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span className="text-white text-xs">Click to enlarge</span>
+                          </div>
                         </div>
                       ) : (
-                        <p className="text-sm text-gray-500">No members assigned to this committee.</p>
+                        <p className="text-sm text-gray-500">No PDF uploaded yet. Use the upload button above.</p>
                       )}
                     </div>
                   </CardContent>
@@ -379,59 +427,17 @@ export default function CommitteesManagement() {
           )}
         </CardContent>
       </Card>
-
-      {/* Add Member Dialog */}
-      <Dialog open={memberDialogOpen} onOpenChange={setMemberDialogOpen}>
-        <DialogContent>
+      {/* Member dialog removed */}
+      <Dialog open={pdfDialogOpen} onOpenChange={setPdfDialogOpen}>
+        <DialogContent className="max-w-5xl">
           <DialogHeader>
-            <DialogTitle>Add Member to Committee</DialogTitle>
-            <DialogDescription>Add a member to {selectedCommittee?.name}</DialogDescription>
+            <DialogTitle>Committee Document</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleAddMember}>
-            <div className="space-y-4">
-              {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-
-              <div>
-                <Label htmlFor="member_id">Select Member</Label>
-                <Select
-                  value={memberFormData.member_id}
-                  onValueChange={(value) => setMemberFormData({ ...memberFormData, member_id: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choose a member" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {members.map((member) => (
-                      <SelectItem key={member.id} value={member.id}>
-                        {member.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="position">Position/Role</Label>
-                <Input
-                  id="position"
-                  value={memberFormData.position}
-                  onChange={(e) => setMemberFormData({ ...memberFormData, position: e.target.value })}
-                  placeholder="e.g., Chairman, Secretary, Member"
-                />
-              </div>
+          {selectedPdfUrl && (
+            <div className="border rounded">
+              <iframe src={selectedPdfUrl} className="w-full h-[80vh]" />
             </div>
-
-            <DialogFooter className="mt-6">
-              <Button type="button" variant="outline" onClick={() => setMemberDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button type="submit">Add Member</Button>
-            </DialogFooter>
-          </form>
+          )}
         </DialogContent>
       </Dialog>
     </div>

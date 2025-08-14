@@ -46,7 +46,7 @@ export async function GET() {
 
 export async function POST(request) {
   try {
-    const { name, description, image_url, is_active } = await request.json()
+    const { name, description, image_url, pdf_url, is_active } = await request.json()
 
     if (!name) {
       return NextResponse.json({ success: false, error: "Name is required" }, { status: 400 })
@@ -60,6 +60,7 @@ export async function POST(request) {
         name,
         description,
         image_url,
+        pdf_url,
         is_active: is_active !== undefined ? is_active : true,
       })
       .select()

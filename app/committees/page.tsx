@@ -4,10 +4,30 @@ import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Users } from "lucide-react"
+import { Users, FileText } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+
+type CommitteeMember = {
+  id: string
+  name: string
+  image_url?: string
+  position?: string
+}
+
+type Committee = {
+  id: string
+  name: string
+  description?: string
+  image_url?: string
+  is_active: boolean
+  members?: CommitteeMember[]
+  pdf_url?: string
+}
 
 export default function CommitteesPage() {
-  const [committees, setCommittees] = useState([])
+  const [committees, setCommittees] = useState<Committee[]>([])
+  const [pdfDialogOpen, setPdfDialogOpen] = useState(false)
+  const [selectedPdfUrl, setSelectedPdfUrl] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
 
@@ -115,29 +135,38 @@ export default function CommitteesPage() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
-                        <div className="flex items-center">
-                          <Users className="h-5 w-5 mr-2 text-gray-500" />
-                          <span className="font-medium">Committee Members ({committee.members?.length || 0})</span>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <FileText className="h-5 w-5 mr-2 text-gray-500" />
+                            <span className="font-medium">Committee PDF</span>
+                          </div>
+                          {committee.pdf_url && (
+                            <a
+                              href={committee.pdf_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm underline"
+                            >
+                              Open in new tab
+                            </a>
+                          )}
                         </div>
-
-                        {committee.members && committee.members.length > 0 ? (
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {committee.members.map((member) => (
-                              <div key={member.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                                <Avatar>
-                                  <AvatarImage src={member.image_url || "/placeholder.svg"} />
-                                  <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
-                                </Avatar>
-                                <div>
-                                  <div className="font-medium text-sm">{member.name}</div>
-                                  <div className="text-xs text-gray-500">{member.position || "Member"}</div>
-                                </div>
-                              </div>
-                            ))}
+                        {committee.pdf_url ? (
+                          <div
+                            className="relative border rounded overflow-hidden cursor-pointer group"
+                            onClick={() => {
+                              setSelectedPdfUrl(committee.pdf_url as string)
+                              setPdfDialogOpen(true)
+                            }}
+                          >
+                            <iframe src={committee.pdf_url} className="w-full h-[240px] pointer-events-none" />
+                            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <span className="text-white text-sm">Click to enlarge</span>
+                            </div>
                           </div>
                         ) : (
                           <p className="text-sm text-gray-500 bg-gray-50 p-4 rounded-lg">
-                            No members assigned to this committee yet.
+                            PDF not available for this committee.
                           </p>
                         )}
                       </div>
@@ -155,6 +184,18 @@ export default function CommitteesPage() {
             </p>
           </div>
         )}
+        <Dialog open={pdfDialogOpen} onOpenChange={setPdfDialogOpen}>
+          <DialogContent className="max-w-5xl">
+            <DialogHeader>
+              <DialogTitle>Committee Document</DialogTitle>
+            </DialogHeader>
+            {selectedPdfUrl && (
+              <div className="border rounded">
+                <iframe src={selectedPdfUrl} className="w-full h-[80vh]" />
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   )

@@ -42,7 +42,7 @@ export async function signIn(email: string, password: string) {
   *,
   member:members(name)
 `)
-      .eq("email", email)
+      .eq("email", String(email).trim().toLowerCase())
       .single()
 
     if (error || !userWithMember) {

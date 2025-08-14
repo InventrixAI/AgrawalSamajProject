@@ -1,3 +1,7 @@
+-- Add pdf_url column to committees table
+ALTER TABLE committees
+ADD COLUMN IF NOT EXISTS pdf_url TEXT;
+
 -- Create home_images table for homepage slider
 CREATE TABLE IF NOT EXISTS home_images (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
