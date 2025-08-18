@@ -2,9 +2,9 @@ import { NextResponse } from "next/server"
 import { supabase } from "@/lib/supabase"
 import bcrypt from "bcryptjs"
 
-export async function POST(request, { params }) {
+export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params
+    const { id } = await params
 
     // Generate a random password
     const newPassword = Math.random().toString(36).slice(-8)
@@ -26,6 +26,6 @@ export async function POST(request, { params }) {
       message: "Password reset successfully",
     })
   } catch (error) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+    return NextResponse.json({ success: false, error: (error as Error).message }, { status: 500 })
   }
 }

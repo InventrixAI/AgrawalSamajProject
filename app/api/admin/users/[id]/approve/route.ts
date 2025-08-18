@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server"
 import { supabase } from "@/lib/supabase"
 
-export async function PUT(request, { params }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { is_approved } = await request.json()
-    const { id } = params
+    const { id } = await params
 
     const { data: user, error } = await supabase
       .from("users")
@@ -17,6 +17,6 @@ export async function PUT(request, { params }) {
 
     return NextResponse.json({ success: true, user })
   } catch (error) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+    return NextResponse.json({ success: false, error: (error as Error).message }, { status: 500 })
   }
 }

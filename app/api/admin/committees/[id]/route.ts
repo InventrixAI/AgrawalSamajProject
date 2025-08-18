@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server"
 import { supabase } from "@/lib/supabase"
 
-export async function PUT(request, { params }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { name, description, image_url, pdf_url, is_active } = await request.json()
-    const { id } = params
+    const { id } = await params
 
     const updatePayload: Record<string, unknown> = { updated_at: new Date().toISOString() }
     if (name !== undefined) updatePayload.name = name
@@ -24,13 +24,13 @@ export async function PUT(request, { params }) {
 
     return NextResponse.json({ success: true, committee })
   } catch (error) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+    return NextResponse.json({ success: false, error: (error as Error).message }, { status: 500 })
   }
 }
 
-export async function DELETE(request, { params }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params
+    const { id } = await params
 
     const { error } = await supabase.from("committees").delete().eq("id", id)
 
@@ -38,6 +38,6 @@ export async function DELETE(request, { params }) {
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+    return NextResponse.json({ success: false, error: (error as Error).message }, { status: 500 })
   }
 }

@@ -2,10 +2,10 @@ import { NextResponse } from "next/server"
 import { createServerClient } from "@/lib/supabase"
 import bcrypt from "bcryptjs"
 
-export async function PUT(request, { params }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { email, password, role, is_approved } = await request.json()
-    const { id } = params
+    const { id } = await params
 
     const updateData: Record<string, unknown> = {
       updated_at: new Date().toISOString(),

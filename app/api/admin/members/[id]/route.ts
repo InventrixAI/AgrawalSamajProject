@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { createServerClient } from "@/lib/supabase"
 
-export async function PUT(request, { params }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const {
       name,
@@ -29,7 +29,7 @@ export async function PUT(request, { params }) {
       image_url,
       is_active,
     } = await request.json()
-    const { id } = params
+    const { id } = await params
 
     const supabase = createServerClient()
 
@@ -74,9 +74,9 @@ export async function PUT(request, { params }) {
   }
 }
 
-export async function DELETE(request, { params }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params
+    const { id } = await params
 
     const supabase = createServerClient()
 

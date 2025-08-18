@@ -172,6 +172,12 @@ export default function CommitteesManagement() {
       const target = e.target as HTMLInputElement
       const file = target.files && target.files[0]
       if (file) {
+        // File size validation (25MB limit)
+        const maxSize = 25 * 1024 * 1024 // 25MB in bytes
+        if (file.size > maxSize) {
+          setError("File size exceeds 25MB limit. Please choose a smaller PDF file.")
+          return
+        }
         handleUploadPdf(committee, file)
       }
     }
@@ -368,8 +374,15 @@ export default function CommitteesManagement() {
                         </div>
                       </div>
                        <div className="flex space-x-2">
-                         <Button size="sm" variant="outline" onClick={() => triggerPdfSelect(committee)} disabled={pdfUploadingId === committee.id}>
-                           <FileUp className="h-4 w-4" />
+                         <Button 
+                           size="sm" 
+                           variant="outline" 
+                           onClick={() => triggerPdfSelect(committee)} 
+                           disabled={pdfUploadingId === committee.id}
+                           title="Upload PDF (Max 25MB)"
+                         >
+                           <FileUp className="h-4 w-4 mr-1" />
+                           {pdfUploadingId === committee.id ? "Uploading..." : "Upload PDF"}
                          </Button>
                          {committee.pdf_url && (
                            <Button size="sm" variant="outline" onClick={() => handleRemovePdf(committee)} disabled={pdfUploadingId === committee.id}>

@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server"
 import { createServerClient } from "@/lib/supabase"
 
-export async function PUT(request, { params }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { title, description, image_url, display_order, is_active } = await request.json()
-    const { id } = params
+    const { id } = await params
 
     const supabase = createServerClient()
 
