@@ -162,26 +162,25 @@ export default function EventsPage() {
                     
                     {/* Contact Person Details */}
                     {(event.contact_person_name || event.contact_person_mobile) && (
-                      <div className="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-200">
-                        <h4 className="font-medium text-orange-800 mb-2">संपर्क विवरण</h4>
-                        {event.contact_person_name && (
-                          <p className="text-sm text-orange-700">
-                            <strong>संपर्क व्यक्ति:</strong> {event.contact_person_name}
-                          </p>
-                        )}
-                        {event.contact_person_address && (
-                          <p className="text-sm text-orange-700">
-                            <strong>पता:</strong> {event.contact_person_address}
-                          </p>
-                        )}
-                        {event.contact_person_mobile && (
-                          <p className="text-sm text-orange-700">
-                            <strong>मोबाइल:</strong> {event.contact_person_mobile}
-                          </p>
-                        )}
-                        <p className="text-xs text-orange-600 mt-1">
-                          इस कार्यक्रम में भाग लेने हेतु संपर्क करें
-                        </p>
+                      <div className="mt-4 pt-3 border-t border-gray-200">
+                        <h4 className="font-medium text-orange-700 mb-2 text-sm">संपर्क विवरण</h4>
+                        <div className="space-y-1">
+                          {event.contact_person_name && (
+                            <p className="text-sm text-gray-600">
+                              <strong>संपर्क व्यक्ति:</strong> {event.contact_person_name}
+                            </p>
+                          )}
+                          {event.contact_person_address && (
+                            <p className="text-sm text-gray-600">
+                              <strong>पता:</strong> {event.contact_person_address}
+                            </p>
+                          )}
+                          {event.contact_person_mobile && (
+                            <p className="text-sm text-gray-600">
+                              <strong>मोबाइल:</strong> {event.contact_person_mobile}
+                            </p>
+                          )}
+                        </div>
                       </div>
                     )}
                   </CardContent>
@@ -250,23 +249,25 @@ export default function EventsPage() {
 
                     {/* Contact Person Details */}
                     {(event.contact_person_name || event.contact_person_mobile) && (
-                      <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                        <h4 className="font-medium text-gray-700 mb-2">संपर्क विवरण</h4>
-                        {event.contact_person_name && (
-                          <p className="text-sm text-gray-600">
-                            <strong>संपर्क व्यक्ति:</strong> {event.contact_person_name}
-                          </p>
-                        )}
-                        {event.contact_person_address && (
-                          <p className="text-sm text-gray-600">
-                            <strong>पता:</strong> {event.contact_person_address}
-                          </p>
-                        )}
-                        {event.contact_person_mobile && (
-                          <p className="text-sm text-gray-600">
-                            <strong>मोबाइल:</strong> {event.contact_person_mobile}
-                          </p>
-                        )}
+                      <div className="mt-4 pt-3 border-t border-gray-200">
+                        <h4 className="font-medium text-gray-700 mb-2 text-sm">संपर्क विवरण</h4>
+                        <div className="space-y-1">
+                          {event.contact_person_name && (
+                            <p className="text-sm text-gray-600">
+                              <strong>संपर्क व्यक्ति:</strong> {event.contact_person_name}
+                            </p>
+                          )}
+                          {event.contact_person_address && (
+                            <p className="text-sm text-gray-600">
+                              <strong>पता:</strong> {event.contact_person_address}
+                            </p>
+                          )}
+                          {event.contact_person_mobile && (
+                            <p className="text-sm text-gray-600">
+                              <strong>मोबाइल:</strong> {event.contact_person_mobile}
+                            </p>
+                          )}
+                        </div>
                       </div>
                     )}
 
