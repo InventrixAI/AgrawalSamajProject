@@ -71,7 +71,7 @@ export default function EventsPage() {
       <div className="min-h-screen py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Events</h1>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">कार्यक्रम</h1>
             <p className="text-lg text-gray-600 mb-8">Loading events...</p>
             <div className="flex justify-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
@@ -87,7 +87,7 @@ export default function EventsPage() {
       <div className="min-h-screen py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Events</h1>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">कार्यक्रम</h1>
             <p className="text-lg text-red-600">{error}</p>
           </div>
         </div>
@@ -100,15 +100,15 @@ export default function EventsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Events</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">कार्यक्रम</h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Stay updated with our community events, celebrations, and gatherings
+            हमारे समुदाय के आयोजनों, त्योहारों और विशेष मिलन-जुलों की नवीनतम जानकारी पाएँ।
           </p>
         </div>
 
-        {/* Upcoming Events */}
+        {/* Upcoming कार्यक्रम */}
         <section className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">Upcoming Events ({upcomingEvents.length})</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-8">आगामी कार्यक्रम ({upcomingEvents.length})</h2>
 
           {upcomingEvents.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
