@@ -58,7 +58,7 @@ export default function CommitteesPage() {
       <div className="min-h-screen py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Our Committees</h1>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">हमारी सभा/ समितियां</h1>
             <p className="text-lg text-gray-600 mb-8">Loading committees...</p>
             <div className="flex justify-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
@@ -74,7 +74,7 @@ export default function CommitteesPage() {
       <div className="min-h-screen py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Our Committees</h1>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">हमारी सभा/ समितियां</h1>
             <p className="text-lg text-red-600">{error}</p>
           </div>
         </div>
@@ -87,9 +87,9 @@ export default function CommitteesPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Our Committees</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">हमारी सभा/ समितियां</h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Learn about our various committees and the dedicated members who lead our community initiatives
+            हमारी विभिन्न समितियों और उन समर्पित सदस्यों के बारे में जानें, जो हमारे सामुदायिक प्रयासों का नेतृत्व करते हैं।
           </p>
         </div>
 

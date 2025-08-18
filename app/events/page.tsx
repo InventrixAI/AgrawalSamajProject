@@ -233,15 +233,6 @@ export default function EventsPage() {
             </div>
           </section>
         )}
-
-        {/* Call to Action */}
-        <section className="bg-orange-50 rounded-lg p-8 mt-16 text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Want to Organize an Event?</h2>
-          <p className="text-gray-600 mb-6">
-            Have an idea for a community event? Get in touch with our events committee.
-          </p>
-          <p className="text-black-300 text-sm">कार्यक्रम के आयोजन हेतु इस मोबाइल नंबर पर संपर्क करे : +919826517676</p>
-        </section>
       </div>
     </div>
   )
