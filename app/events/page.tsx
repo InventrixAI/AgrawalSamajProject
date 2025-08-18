@@ -111,7 +111,7 @@ export default function EventsPage() {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">कार्यक्रम</h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            हमारे समुदाय के आयोजनों, त्योहारों और विशेष मिलन-जुलों की नवीनतम जानकारी पाएँ।
+            हमारे समुदाय द्वारा आयोजित विशेष कार्यक्रमों और गतिविधियों में शामिल होने का अवसर पाएं।
           </p>
         </div>
 
