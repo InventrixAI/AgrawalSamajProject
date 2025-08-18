@@ -32,7 +32,17 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { title, description, event_date, location, image_url, is_active } = await request.json()
+    const { 
+      title, 
+      description, 
+      event_date, 
+      location, 
+      image_url, 
+      contact_person_name,
+      contact_person_address,
+      contact_person_mobile,
+      is_active 
+    } = await request.json()
 
     if (!title || !event_date) {
       return NextResponse.json({ success: false, error: "Title and event date are required" }, { status: 400 })
@@ -54,6 +64,9 @@ export async function POST(request: Request) {
         event_date: convertISTToUTC(event_date),
         location,
         image_url,
+        contact_person_name,
+        contact_person_address,
+        contact_person_mobile,
         is_active: is_active !== undefined ? is_active : true,
       })
       .select()

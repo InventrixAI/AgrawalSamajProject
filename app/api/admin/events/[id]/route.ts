@@ -3,7 +3,17 @@ import { supabase } from "@/lib/supabase"
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   try {
-    const { title, description, event_date, location, image_url, is_active } = await request.json()
+    const { 
+      title, 
+      description, 
+      event_date, 
+      location, 
+      image_url, 
+      contact_person_name,
+      contact_person_address,
+      contact_person_mobile,
+      is_active 
+    } = await request.json()
     const { id } = params
 
     // Convert IST to UTC for database storage
@@ -22,6 +32,9 @@ export async function PUT(request: Request, { params }: { params: { id: string }
         event_date: event_date ? convertISTToUTC(event_date) : undefined,
         location,
         image_url,
+        contact_person_name,
+        contact_person_address,
+        contact_person_mobile,
         is_active,
         updated_at: new Date().toISOString(),
       })

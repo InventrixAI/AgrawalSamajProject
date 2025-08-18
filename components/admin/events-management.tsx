@@ -30,6 +30,9 @@ export default function EventsManagement() {
     description: "",
     event_date: "",
     location: "",
+    contact_person_name: "",
+    contact_person_address: "",
+    contact_person_mobile: "",
     is_active: true,
   })
   const [error, setError] = useState("")
@@ -128,19 +131,25 @@ export default function EventsManagement() {
       description: "",
       event_date: "",
       location: "",
+      contact_person_name: "",
+      contact_person_address: "",
+      contact_person_mobile: "",
       is_active: true,
     })
     setEditingEvent(null)
     setImageFile(null)
   }
 
-  const openEditDialog = (event) => {
+  const openEditDialog = (event: any) => {
     setEditingEvent(event)
     setFormData({
       title: event.title,
       description: event.description || "",
       event_date: new Date(event.event_date).toISOString().slice(0, 16),
       location: event.location || "",
+      contact_person_name: event.contact_person_name || "",
+      contact_person_address: event.contact_person_address || "",
+      contact_person_mobile: event.contact_person_mobile || "",
       is_active: event.is_active,
     })
     setDialogOpen(true)
@@ -218,9 +227,46 @@ export default function EventsManagement() {
                     </div>
                   </div>
 
+                  {/* Contact Person Details */}
+                  <div className="space-y-4 border-t pt-4">
+                    <h3 className="font-medium text-lg">Contact Person Details</h3>
+                    
+                    <div>
+                      <Label htmlFor="contact_person_name">Contact Person Name</Label>
+                      <Input
+                        id="contact_person_name"
+                        value={formData.contact_person_name}
+                        onChange={(e) => setFormData({ ...formData, contact_person_name: e.target.value })}
+                        placeholder="Enter contact person's name"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="contact_person_address">Contact Person Address</Label>
+                      <Textarea
+                        id="contact_person_address"
+                        value={formData.contact_person_address}
+                        onChange={(e) => setFormData({ ...formData, contact_person_address: e.target.value })}
+                        placeholder="Enter contact person's address"
+                        rows={3}
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="contact_person_mobile">Contact Person Mobile Number</Label>
+                      <Input
+                        id="contact_person_mobile"
+                        value={formData.contact_person_mobile}
+                        onChange={(e) => setFormData({ ...formData, contact_person_mobile: e.target.value })}
+                        placeholder="Enter mobile number (e.g., +919826517676)"
+                        type="tel"
+                      />
+                    </div>
+                  </div>
+
                   <div>
                     <Label htmlFor="image">Event Image</Label>
-                    <Input id="image" type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files[0])} />
+                    <Input id="image" type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files?.[0] || null)} />
                   </div>
 
                   <div className="flex items-center space-x-2">
