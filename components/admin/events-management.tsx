@@ -142,10 +142,28 @@ export default function EventsManagement() {
 
   const openEditDialog = (event: any) => {
     setEditingEvent(event)
+    
+    // Handle the date string carefully to avoid timezone issues
+    let dateString = event.event_date
+    console.log("Original date from DB:", dateString)
+    
+    // If the date doesn't have timezone info, treat it as local time
+    let dateForInput: string
+    
+    if (dateString.includes('T')) {
+      // Remove any timezone info and use as local time
+      dateForInput = dateString.replace('Z', '').replace(/[+-]\d{2}:\d{2}$/, '').slice(0, 16)
+    } else {
+      // If it's just a date, add time
+      dateForInput = dateString.slice(0, 16)
+    }
+    
+    console.log("Date for input:", dateForInput)
+    
     setFormData({
       title: event.title,
       description: event.description || "",
-      event_date: new Date(event.event_date).toISOString().slice(0, 16),
+      event_date: dateForInput,
       location: event.location || "",
       contact_person_name: event.contact_person_name || "",
       contact_person_address: event.contact_person_address || "",
@@ -323,7 +341,26 @@ export default function EventsManagement() {
                   <TableCell>
                     <div className="flex items-center">
                       <Calendar className="h-4 w-4 mr-2" />
-                      {new Date(event.event_date).toLocaleDateString()}
+                      <div>
+                        {(() => {
+                          // Treat date as local time by removing timezone info
+                          let dateString = event.event_date.replace('Z', '').replace(/[+-]\d{2}:\d{2}$/, '')
+                          let date = new Date(dateString)
+                          
+                          return (
+                            <>
+                              <div>{date.toLocaleDateString('en-IN')}</div>
+                              <div className="text-xs text-gray-500">
+                                {date.toLocaleTimeString('en-IN', { 
+                                  hour: '2-digit', 
+                                  minute: '2-digit', 
+                                  hour12: true
+                                })}
+                              </div>
+                            </>
+                          )
+                        })()}
+                      </div>
                     </div>
                   </TableCell>
                   <TableCell>{event.location}</TableCell>

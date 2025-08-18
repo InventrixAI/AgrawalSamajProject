@@ -47,7 +47,9 @@ export default function EventsPage() {
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-IN", {
+    // Remove timezone info to treat as local time
+    const localDateString = dateString.replace('Z', '').replace(/[+-]\d{2}:\d{2}$/, '')
+    return new Date(localDateString).toLocaleDateString("en-IN", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -55,7 +57,9 @@ export default function EventsPage() {
   }
 
   const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString("en-IN", {
+    // Remove timezone info to treat as local time
+    const localDateString = dateString.replace('Z', '').replace(/[+-]\d{2}:\d{2}$/, '')
+    return new Date(localDateString).toLocaleTimeString("en-IN", {
       hour: "2-digit",
       minute: "2-digit",
       hour12: true,
@@ -63,7 +67,9 @@ export default function EventsPage() {
   }
 
   const isUpcoming = (eventDate: string) => {
-    return new Date(eventDate) > new Date()
+    // Remove timezone info to treat as local time
+    const localDateString = eventDate.replace('Z', '').replace(/[+-]\d{2}:\d{2}$/, '')
+    return new Date(localDateString) > new Date()
   }
 
   const upcomingEvents = events.filter((event) => isUpcoming(event.event_date))

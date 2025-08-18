@@ -16,20 +16,12 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     } = await request.json()
     const { id } = params
 
-    // Convert IST to UTC for database storage
-    const convertISTToUTC = (istDateString: string) => {
-      const istDate = new Date(istDateString)
-      // IST is UTC+5:30, so subtract 5.5 hours to convert to UTC
-      const utcDate = new Date(istDate.getTime() - (5.5 * 60 * 60 * 1000))
-      return utcDate.toISOString()
-    }
-
     const { data: event, error } = await supabase
       .from("events")
       .update({
         title,
         description,
-        event_date: event_date ? convertISTToUTC(event_date) : undefined,
+        event_date,
         location,
         image_url,
         contact_person_name,

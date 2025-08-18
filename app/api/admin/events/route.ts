@@ -7,23 +7,9 @@ export async function GET() {
 
     if (error) throw error
 
-    // Convert UTC back to IST for proper display in admin panel
-    const convertUTCToIST = (utcDateString: string) => {
-      const utcDate = new Date(utcDateString)
-      // Add 5.5 hours to UTC to get IST
-      const istDate = new Date(utcDate.getTime() + (5.5 * 60 * 60 * 1000))
-      return istDate.toISOString()
-    }
-
-    // Process events to ensure correct timezone display
-    const processedEvents = events.map(event => ({
-      ...event,
-      event_date: convertUTCToIST(event.event_date)
-    }))
-
     return NextResponse.json({
       success: true,
-      events: processedEvents,
+      events,
     })
   } catch (error) {
     return NextResponse.json({ success: false, error: (error as Error).message }, { status: 500 })
@@ -48,20 +34,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Title and event date are required" }, { status: 400 })
     }
 
-    // Convert IST to UTC for database storage
-    const convertISTToUTC = (istDateString: string) => {
-      const istDate = new Date(istDateString)
-      // IST is UTC+5:30, so subtract 5.5 hours to convert to UTC
-      const utcDate = new Date(istDate.getTime() - (5.5 * 60 * 60 * 1000))
-      return utcDate.toISOString()
-    }
-
     const { data: event, error } = await supabase
       .from("events")
       .insert({
         title,
         description,
-        event_date: convertISTToUTC(event_date),
+        event_date,
         location,
         image_url,
         contact_person_name,
