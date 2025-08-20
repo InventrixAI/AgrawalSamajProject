@@ -48,7 +48,11 @@ export default function EventsManagement() {
       const response = await fetch("/api/admin/events")
       const data = await response.json()
       if (data.success) {
-        setEvents(data.events)
+        // Sort events by event_date in ascending order
+        const sortedEvents = data.events.sort((a: any, b: any) => {
+          return new Date(a.event_date).getTime() - new Date(b.event_date).getTime();
+        });
+        setEvents(sortedEvents);
       }
     } catch (error) {
       console.error("Error fetching events:", error)

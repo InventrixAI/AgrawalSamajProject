@@ -97,9 +97,9 @@ export default function HomePage() {
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Community</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">हमारा समुदाय</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Connecting Agrawal families across Bilaspur through culture, tradition, and mutual support
+            संस्कृति, परंपरा और आपसी सहयोग के माध्यम से बिलासपुर भर के अग्रवाल परिवारों को जोड़ना
             </p>
           </div>
 
@@ -107,40 +107,40 @@ export default function HomePage() {
             <Card className="text-center">
               <CardHeader>
                 <Users className="h-12 w-12 text-orange-600 mx-auto mb-4" />
-                <CardTitle>Community</CardTitle>
+                <CardTitle>समुदाय</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription>Strong network of Agrawal families supporting each other</CardDescription>
+                <CardDescription>बिलासपुर अग्रवाल समाज आपसी भाईचारे एवं मेलजोल एवं आपसी सहयोग पर कार्य करता है।</CardDescription>
               </CardContent>
             </Card>
 
             <Card className="text-center">
               <CardHeader>
                 <Calendar className="h-12 w-12 text-orange-600 mx-auto mb-4" />
-                <CardTitle>Events</CardTitle>
+                <CardTitle>कार्यक्रम</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription>Regular cultural and social events for all age groups</CardDescription>
+                <CardDescription>बिलासपुर अग्रवाल समाज समय-समय पर सामाजिक/सांस्कृतिक कार्यक्रम करते हैं</CardDescription>
               </CardContent>
             </Card>
 
             <Card className="text-center">
               <CardHeader>
                 <Award className="h-12 w-12 text-orange-600 mx-auto mb-4" />
-                <CardTitle>Heritage</CardTitle>
+                <CardTitle>हमारी विरासत</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription>Preserving and promoting our rich cultural traditions</CardDescription>
+                <CardDescription>हम अग्रवालों की विरासत लगभग 5000 वर्ष पुरानी श्री अग्रसेन महाराज के वंशज हैं हम जो सिर्फ सेवा और सहयोग पर कार्य करते हैं</CardDescription>
               </CardContent>
             </Card>
 
             <Card className="text-center">
               <CardHeader>
                 <Heart className="h-12 w-12 text-orange-600 mx-auto mb-4" />
-                <CardTitle>Support</CardTitle>
+                <CardTitle>सहयोग</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription>Helping community members in times of need</CardDescription>
+                <CardDescription>सभी को सहयोग और सहायता पर हम कार्य करते है</CardDescription>
               </CardContent>
             </Card>
           </div>
@@ -151,8 +151,8 @@ export default function HomePage() {
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Upcoming Events</h2>
-            <p className="text-lg text-gray-600">Join us in our upcoming community gatherings</p>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">आगामी कार्यक्रम</h2>
+            <p className="text-lg text-gray-600">हमारे आगामी सामुदायिक समारोहों में शामिल हों</p>
           </div>
 
           {upcomingEvents.length > 0 ? (
@@ -168,16 +168,16 @@ export default function HomePage() {
                       {event.description?.slice(0, 100)}
                       {event.description?.length > 100 ? "..." : ""}
                     </p>
-                    <Button className="bg-transparent" variant="outline">
+                    {/*<Button className="bg-transparent" variant="outline">
                       Learn More
-                    </Button>
+                    </Button>*/}
                   </CardContent>
                 </Card>
               ))}
             </div>
           ) : (
             <div className="text-center py-8">
-              <p className="text-gray-600 text-lg">No upcoming events scheduled at the moment.</p>
+              <p className="text-gray-600 text-lg">फिलहाल कोई आगामी कार्यक्रम निर्धारित नहीं है।</p>
               <p className="text-gray-500 text-sm mt-2">Check back later for new events!</p>
             </div>
           )}
@@ -193,9 +193,9 @@ export default function HomePage() {
       {/* Call to Action */}
       <section className="bg-orange-600 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Join Our Community?</h2>
+          <h2 className="text-3xl font-bold mb-4">क्या आप हमारे समुदाय में शामिल होने के लिए तैयार हैं?</h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto">
-            Become part of the Bilaspur Agrawal Sabha family and connect with your community
+          बिलासपुर अग्रवाल सभा परिवार का हिस्सा बनें और अपने समुदाय से जुड़ें।
           </p>
           <Link href="/register">
             <Button size="lg" variant="secondary">

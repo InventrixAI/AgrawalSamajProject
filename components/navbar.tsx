@@ -47,7 +47,7 @@ export default function Navbar() {
 
   const navItems = [
     { href: "/", label:"होम" },
-    { href: "/about", label: "हमारे बारे में" },
+    { href: "/about", label: "सभा सदस्य" },
     { href: "/events", label: "कार्यक्रम" },
     { href: "/members", label: "समाज लिस्ट" },
     { href: "/committees", label: "सभा / समितियां" },

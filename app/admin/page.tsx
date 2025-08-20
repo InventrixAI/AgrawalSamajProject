@@ -10,6 +10,7 @@ import EventsManagement from "@/components/admin/events-management"
 import CommitteesManagement from "@/components/admin/committees-management"
 import UsersManagement from "@/components/admin/users-management"
 import HomeImagesManagement from "@/components/admin/home-images-management"
+import SabhaSadasyaManagement from "@/components/admin/sabha-sadasya-management"
 
 export default function AdminDashboard() {
   const [user, setUser] = useState(null)
@@ -125,6 +126,7 @@ export default function AdminDashboard() {
             <TabsTrigger value="events">Events</TabsTrigger>
             <TabsTrigger value="committees">Committees</TabsTrigger>
             <TabsTrigger value="home-images">Home Images</TabsTrigger>
+            <TabsTrigger value="sabha-sadasya">सभा सदस्य</TabsTrigger>
           </TabsList>
 
           <TabsContent value="users">
@@ -145,6 +147,10 @@ export default function AdminDashboard() {
 
           <TabsContent value="home-images">
             <HomeImagesManagement />
+          </TabsContent>
+
+          <TabsContent value="sabha-sadasya">
+            <SabhaSadasyaManagement />
           </TabsContent>
         </Tabs>
       </div>

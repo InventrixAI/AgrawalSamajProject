@@ -90,7 +90,7 @@ export default function MembersPage() {
       <div className="min-h-screen py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Our Members</h1>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">हमारे सदस्य</h1>
             <p className="text-lg text-gray-600 mb-8">Loading members...</p>
             <div className="flex justify-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
@@ -106,7 +106,7 @@ export default function MembersPage() {
       <div className="min-h-screen py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Our Members</h1>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">हमारे सदस्य</h1>
             <p className="text-lg text-red-600">{error}</p>
           </div>
         </div>
@@ -119,9 +119,9 @@ export default function MembersPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Our Members</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">हमारे सदस्य</h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Meet the dedicated members of our community who contribute to our growth and success
+            हमारे समुदाय के उन समर्पित सदस्यों से मिलें जो हमारी वृद्धि और सफलता में योगदान देते हैं
           </p>
         </div>
 
