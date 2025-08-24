@@ -89,7 +89,7 @@ export default function CommitteesPage() {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">हमारी सभा/ समितियां</h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Learn about our various committees and the dedicated members who lead our community initiatives
+          हमारी विभिन्न समितियों और हमारे सामुदायिक पहलों का नेतृत्व करने वाले समर्पित सदस्यों के बारे में जानें
           </p>
         </div>
 

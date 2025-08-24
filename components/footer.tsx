@@ -30,11 +30,11 @@ export default function Footer() {
                   कार्यक्रम
                 </Link>
               </li>
-              <li>
+              {/*<li>
                 <Link href="/members" className="text-gray-300 hover:text-white">
                   समाज लिस्ट
                 </Link>
-              </li>
+              </li>*/}
               <li>
                 <Link href="/committees" className="text-gray-300 hover:text-white">
                   सभा / समितियां

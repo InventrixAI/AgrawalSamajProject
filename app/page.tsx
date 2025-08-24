@@ -11,10 +11,12 @@ export default function HomePage() {
   const [upcomingEvents, setUpcomingEvents] = useState([])
   const [sliderImages, setSliderImages] = useState([])
   const [loading, setLoading] = useState(true)
+  const [scrollingNote, setScrollingNote] = useState<string | null>(null)
 
   useEffect(() => {
     fetchUpcomingEvents()
     fetchSliderImages()
+    fetchScrollingNote()
   }, [])
 
   const fetchUpcomingEvents = async () => {
@@ -24,7 +26,7 @@ export default function HomePage() {
 
       if (data.success) {
         // Filter upcoming events and limit to 3
-        const upcoming = data.events.filter((event) => new Date(event.event_date) > new Date()).slice(0, 3)
+        const upcoming = data.events.filter((event: any) => new Date(event.event_date) > new Date()).slice(0, 3)
         setUpcomingEvents(upcoming)
       }
     } catch (error) {
@@ -44,6 +46,18 @@ export default function HomePage() {
       console.error("Error fetching slider images:", error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchScrollingNote = async () => {
+    try {
+      const response = await fetch("/api/admin/scrolling-notes")
+      const data = await response.json()
+      if (data.success && data.note) {
+        setScrollingNote(data.note.message)
+      }
+    } catch (error) {
+      console.error("Error fetching scrolling note:", error)
     }
   }
 
@@ -68,6 +82,15 @@ export default function HomePage() {
           </div>
         ) : (
           <ImageSlider images={sliderImages} autoSlide={true} slideInterval={5000} />
+        )}
+
+        {/* Scrolling Note */}
+        {scrollingNote && (
+          <div className="w-full bg-yellow-400 py-3 overflow-hidden whitespace-nowrap">
+            <div className="animate-marquee inline-block text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 px-4">
+              {scrollingNote}
+            </div>
+          </div>
         )}
 
         {/* Call to Action Buttons */}

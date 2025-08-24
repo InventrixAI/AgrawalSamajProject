@@ -11,6 +11,9 @@ import CommitteesManagement from "@/components/admin/committees-management"
 import UsersManagement from "@/components/admin/users-management"
 import HomeImagesManagement from "@/components/admin/home-images-management"
 import SabhaSadasyaManagement from "@/components/admin/sabha-sadasya-management"
+import PatraPatrikaenManagement from "@/components/admin/patra-patrikaen-management"
+import SadasyaSuchiManagement from "@/components/admin/sadasya-suchi-management"
+import ScrollingNoteManagement from "@/components/admin/scrolling-note-management"
 
 export default function AdminDashboard() {
   const [user, setUser] = useState(null)
@@ -127,6 +130,9 @@ export default function AdminDashboard() {
             <TabsTrigger value="committees">Committees</TabsTrigger>
             <TabsTrigger value="home-images">Home Images</TabsTrigger>
             <TabsTrigger value="sabha-sadasya">सभा सदस्य</TabsTrigger>
+            <TabsTrigger value="patra-patrikaen">पत्र पत्रिकाएँ</TabsTrigger>
+            <TabsTrigger value="sadasya-suchi">समाज सूची</TabsTrigger>
+            <TabsTrigger value="scrolling-note">नोट</TabsTrigger>
           </TabsList>
 
           <TabsContent value="users">
@@ -151,6 +157,18 @@ export default function AdminDashboard() {
 
           <TabsContent value="sabha-sadasya">
             <SabhaSadasyaManagement />
+          </TabsContent>
+
+          <TabsContent value="patra-patrikaen">
+            <PatraPatrikaenManagement />
+          </TabsContent>
+
+          <TabsContent value="sadasya-suchi">
+            <SadasyaSuchiManagement />
+          </TabsContent>
+
+          <TabsContent value="scrolling-note">
+            <ScrollingNoteManagement />
           </TabsContent>
         </Tabs>
       </div>
