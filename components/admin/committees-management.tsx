@@ -134,13 +134,28 @@ export default function CommitteesManagement() {
 
     try {
       setPdfUploadingId(committee.id)
-      const formData = new FormData()
-      formData.append("file", file)
 
-      const uploadResponse = await fetch("/api/upload", { method: "POST", body: formData })
+      // Direct upload to Cloudinary with server-generated signature
+      const sigRes = await fetch("/api/cloudinary/signature")
+      const sigData = await sigRes.json()
+      if (!sigData.success) {
+        setError(sigData.error || "Failed to get Cloudinary signature")
+        setPdfUploadingId(null)
+        return
+      }
+
+      const fd = new FormData()
+      fd.append("file", file)
+      fd.append("api_key", sigData.apiKey)
+      fd.append("timestamp", String(sigData.timestamp))
+      fd.append("signature", sigData.signature)
+      fd.append("folder", sigData.folder)
+
+      const cloudUrl = `https://api.cloudinary.com/v1_1/${sigData.cloudName}/auto/upload`
+      const uploadResponse = await fetch(cloudUrl, { method: "POST", body: fd })
       const uploadData = await uploadResponse.json()
-      if (!uploadData.success) {
-        setError(uploadData.error || "Failed to upload PDF")
+      if (!uploadResponse.ok || !uploadData.secure_url) {
+        setError(uploadData.error?.message || "Failed to upload PDF")
         setPdfUploadingId(null)
         return
       }
@@ -148,7 +163,7 @@ export default function CommitteesManagement() {
       const updateResponse = await fetch(`/api/admin/committees/${committee.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pdf_url: uploadData.url }),
+        body: JSON.stringify({ pdf_url: uploadData.secure_url }),
       })
       const updateData = await updateResponse.json()
       if (updateData.success) {

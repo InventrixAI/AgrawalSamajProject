@@ -74,22 +74,35 @@ export default function PatraPatrikaenManagement() {
 
     try {
       setPdfUploading(true)
-      const formData = new FormData()
-      formData.append("file", newPdfFile)
-
-      const uploadResponse = await fetch("/api/upload", { method: "POST", body: formData })
-      const uploadData = await uploadResponse.json()
-      if (!uploadData.success) {
-        setError(uploadData.error || "Failed to upload PDF file")
+      // Direct Cloudinary upload
+      const sigRes = await fetch("/api/cloudinary/signature")
+      const sigData = await sigRes.json()
+      if (!sigData.success) {
+        setError(sigData.error || "Failed to get Cloudinary signature")
         setPdfUploading(false)
         return
       }
 
-      // Now save the PDF URL and title to your patra_patrikaen table
+      const fd = new FormData()
+      fd.append("file", newPdfFile)
+      fd.append("api_key", sigData.apiKey)
+      fd.append("timestamp", String(sigData.timestamp))
+      fd.append("signature", sigData.signature)
+      fd.append("folder", sigData.folder)
+
+      const cloudUrl = `https://api.cloudinary.com/v1_1/${sigData.cloudName}/auto/upload`
+      const uploadResponse = await fetch(cloudUrl, { method: "POST", body: fd })
+      const uploadData = await uploadResponse.json()
+      if (!uploadResponse.ok || !uploadData.secure_url) {
+        setError(uploadData.error?.message || "Failed to upload PDF file to Cloudinary")
+        setPdfUploading(false)
+        return
+      }
+
       const saveResponse = await fetch("/api/admin/patra-patrikaen", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pdf_url: uploadData.url, title: newPdfTitle }),
+        body: JSON.stringify({ pdf_url: uploadData.secure_url, title: newPdfTitle }),
       })
       const saveData = await saveResponse.json()
       if (saveData.success) {
