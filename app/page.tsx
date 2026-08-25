@@ -214,7 +214,7 @@ export default function HomePage() {
       </section>
 
       {/* Call to Action */}
-      <section className="bg-orange-600 text-white py-16">
+      {/* <section className="bg-orange-600 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-4">क्या आप हमारे समुदाय में शामिल होने के लिए तैयार हैं?</h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto">
@@ -226,7 +226,7 @@ export default function HomePage() {
             </Button>
           </Link>
         </div>
-      </section>
+      </section> */}
     </div>
   )
 }
