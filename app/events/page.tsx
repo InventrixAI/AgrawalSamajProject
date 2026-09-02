@@ -111,7 +111,7 @@ export default function EventsPage() {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">कार्यक्रम</h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            बिलासपुर अग्रवाल समाज हेतु वर्ष 2025 में श्री अग्रसेन जयंती पर होने वाले कार्यक्रमों की जानकारी
+            बिलासपुर अग्रवाल समाज हेतु वर्ष 2026 में श्री अग्रसेन जयंती पर होने वाले कार्यक्रमों की जानकारी
           </p>
         </div>
 
